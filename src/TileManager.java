@@ -27,46 +27,26 @@ public class TileManager {
 
     public void getTileImage() {
 
+        setup(0, "grass", false);
+        setup(1, "grama2", false);
+        setup(2, "grama3", false);
+        setup(3, "grama", false);
+        setup(4, "água", true);
+        setup(5, "caminhomadeira", false);
+        setup(6, "muropedra", true);
+        setup(7, "caminhoterra", false);
+        setup(8, "tocha", true);
+        setup(9, "portamina", false);
+    }
+    public void setup(int index, String imageName, boolean collision) {
+
+        UtilityTool uTool = new UtilityTool();
+
         try {
-
-            tile[0] = new Tile();
-            tile[0].image = ImageIO.read(getClass().getResourceAsStream("/tiles/arvorealta.png"));
-            tile[0].collision = false;
-
-            tile[1] = new Tile();
-            tile[1].image = ImageIO.read(getClass().getResourceAsStream("/tiles/grama2.png"));
-
-            tile[2] = new Tile();
-            tile[2].image = ImageIO.read(getClass().getResourceAsStream("/tiles/grama3.png"));
-
-            tile[3] = new Tile();
-            tile[3].image = ImageIO.read(getClass().getResourceAsStream("/tiles/grama.png"));
-
-            tile[4] = new Tile();
-            tile[4].image = ImageIO.read(getClass().getResourceAsStream("/tiles/agua.png"));
-            tile[4].collision = true;
-
-            tile[5] = new Tile();
-            tile[5].image = ImageIO.read(getClass().getResourceAsStream("/tiles/caminhomadeira.png"));
-
-            tile[6] = new Tile();
-            tile[6].image = ImageIO.read(getClass().getResourceAsStream("/tiles/muropedra.png"));
-            tile[6].collision = true;
-
-            tile[7] = new Tile();
-            tile[7].image = ImageIO.read(getClass().getResourceAsStream("/tiles/caminhoterra.png"));
-
-            tile[8] = new Tile();
-            tile[8].image = ImageIO.read(getClass().getResourceAsStream("/tiles/tocha.png"));
-            tile[8].collision = true;
-
-            tile[9] = new Tile();
-            tile[9].image = ImageIO.read(getClass().getResourceAsStream("/tiles/portamina.png"));
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            tile[index] = new Tile();
+            tile[index].image = ImageIO.read(getClass().getResourceAsStream("/tiles/" + imageName + ".png"));
+            tile[index].image = uTool.scaleImage(tile[index].image, gp.tileSize, gp.tileSize);
+            tile[index].collision = collision;
     }
     public void carregarMapa(String filePath) {
         try {
@@ -113,7 +93,7 @@ public class TileManager {
             if(worldX + gp.tileSize > gp.player.worldX - gp.player.screenX && worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
                     worldY + gp.tileSize > gp.player.worldY - gp.player.screenY && worldY - gp.tileSize < gp.player.worldY + gp.player.screenY ) {
 
-                g2.drawImage(tile[tileNum].image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+                g2.drawImage(tile[tileNum].image, screenX, screenY, null);
             }
 
             worldCol++;
