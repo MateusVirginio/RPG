@@ -21,11 +21,13 @@ public class Player extends Entity{
 
         setDefaultValues();
         getPlayerImage();
+
+        solidArea = new Rectangle(8,16,32,32);
     }
     public void setDefaultValues() {
 
         worldX = gp.tileSize * 12;
-        worldY = gp.tileSize * 12;
+        worldY = gp.tileSize * 11;
         speed = 4;
         direction = "down";
     }
@@ -54,20 +56,39 @@ public class Player extends Entity{
 
             if(keyH.upPressed == true) {
                 direction = "up";
-                worldY -= speed;
             }
             else if(keyH.downPressed == true) {
                 direction = "down";
-                worldY += speed;
             }
             else if(keyH.leftPressed == true) {
                 direction = "left";
-                worldX -= speed;
             }
             else if(keyH.rightPressed == true) {
                 direction = "right";
-                worldX += speed;
             }
+            // Checar Colisao Do Tile
+            colisionOn = false;
+            gp.Colisao.ChecarTile(this);
+
+            // Se a colisao for falsa, o jogador pode se mover
+            if (colisionOn == false) {
+
+                switch (direction) {
+                    case "up":
+                        worldY -= speed;
+                        break;
+                    case "down":
+                        worldY += speed;
+                        break;
+                    case "left":
+                        worldX -= speed;
+                        break;
+                    case "right":
+                        worldX += speed;
+                        break;
+                }
+            }
+
             spriteCounter++;
             if(spriteCounter > 12) {
                 if(spriteNum == 1) {

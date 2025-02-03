@@ -11,8 +11,8 @@ import java.nio.Buffer;
 public class TileManager {
 
     GamePanel gp;
-    Tile[] tile;
-    int mapTileNum[][];
+    public Tile[] tile;
+    public int mapTileNum[][];
 
 
     public TileManager(GamePanel gp) {
@@ -31,24 +31,38 @@ public class TileManager {
 
             tile[0] = new Tile();
             tile[0].image = ImageIO.read(getClass().getResourceAsStream("/tiles/arvorealta.png"));
+            tile[0].collision = false;
+
             tile[1] = new Tile();
             tile[1].image = ImageIO.read(getClass().getResourceAsStream("/tiles/grama2.png"));
+
             tile[2] = new Tile();
             tile[2].image = ImageIO.read(getClass().getResourceAsStream("/tiles/grama3.png"));
+
             tile[3] = new Tile();
             tile[3].image = ImageIO.read(getClass().getResourceAsStream("/tiles/grama.png"));
+
             tile[4] = new Tile();
             tile[4].image = ImageIO.read(getClass().getResourceAsStream("/tiles/agua.png"));
+            tile[4].collision = true;
+
             tile[5] = new Tile();
             tile[5].image = ImageIO.read(getClass().getResourceAsStream("/tiles/caminhomadeira.png"));
+
             tile[6] = new Tile();
             tile[6].image = ImageIO.read(getClass().getResourceAsStream("/tiles/muropedra.png"));
+            tile[6].collision = true;
+
             tile[7] = new Tile();
             tile[7].image = ImageIO.read(getClass().getResourceAsStream("/tiles/caminhoterra.png"));
+
             tile[8] = new Tile();
             tile[8].image = ImageIO.read(getClass().getResourceAsStream("/tiles/tocha.png"));
+            tile[8].collision = true;
+
             tile[9] = new Tile();
             tile[9].image = ImageIO.read(getClass().getResourceAsStream("/tiles/portamina.png"));
+
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -62,15 +76,15 @@ public class TileManager {
             int col  = 0;
             int row = 0;
 
-            while (col < gp.maxWorldCol && row < gp.maxWorldRow) {
+            while (col < gp.maxScreenCol && row < gp.maxScreenRow) {
                 String line = br.readLine();
-                while(col < gp.maxWorldCol) {
+                while(col < gp.maxScreenCol) {
                     String numbers[] = line.split(" ");
                     int num = Integer.parseInt(numbers[col]);
                     mapTileNum[col][row] = num;
                     col++;
                 }
-                if(col == gp.maxWorldCol) {
+                if(col == gp.maxScreenCol) {
                     col = 0;
                     row++;
                 }
@@ -97,37 +111,17 @@ public class TileManager {
             int screenY = worldY - gp.player.worldY + gp.player.screenY;
 
             if(worldX + gp.tileSize > gp.player.worldX - gp.player.screenX && worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
-            worldY + gp.tileSize > gp.player.worldY - gp.player.screenY && worldY - gp.tileSize < gp.player.worldY + gp.player.screenY ) {
+                    worldY + gp.tileSize > gp.player.worldY - gp.player.screenY && worldY - gp.tileSize < gp.player.worldY + gp.player.screenY ) {
 
                 g2.drawImage(tile[tileNum].image, screenX, screenY, gp.tileSize, gp.tileSize, null);
             }
 
             worldCol++;
 
-
             if(worldCol == gp.maxWorldCol) {
                 worldCol = 0;
                 worldRow++;
             }
         }
-
-
-
-
-
-
     }
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
