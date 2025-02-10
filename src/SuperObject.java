@@ -6,4 +6,5 @@ public class SuperObject {
     public boolean collision = false;
     public int worldX, worldY;
 
+    UtilityTool uTool = new UtilityTool();
 }
