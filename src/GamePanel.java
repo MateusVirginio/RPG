@@ -1,6 +1,10 @@
 
 import javax.swing.*;
 import java.awt.*;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class GamePanel extends JPanel implements Runnable {
 
@@ -23,12 +27,18 @@ public class GamePanel extends JPanel implements Runnable {
     //FPS
     int FPS = 60;
 
+    //SISTEMA
     TileManager tileM = new TileManager(this);
-    KeyHandler keyH = new KeyHandler(this);
+    public KeyHandler keyH = new KeyHandler(this);
     Thread gameThread;
     public ChecarColisao Colisao = new ChecarColisao(this);
     public UI ui = new UI(this);
-    Player player = new Player(this,keyH);
+    public AssetSetter aSetter = new AssetSetter(this);
+
+    //ENTIDADES E OBJETOS
+    public Player player = new Player(this, keyH);
+    public Entity monster[] = new Entity[10];
+    ArrayList<Entity> entityList = new ArrayList<>();
 
     //ESTADO DO JOGO
     public int gameState;
@@ -46,32 +56,32 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void setupGame() {
-        gameState = playState;
+        aSetter.setMonster();
         gameState = titleState;
-
     }
 
     public void startGameThread() {
         gameThread = new Thread(this);
         gameThread.start();
     }
+
     public void run() {
 
-        double drawInterval = 1000000000/FPS; // 0.01666 seconds
+        double drawInterval = 1000000000 / FPS; // 0.01666 seconds
         double nextDrawTime = System.nanoTime() + drawInterval;
 
-        while(gameThread != null) {
+        while (gameThread != null) {
 
-        update();
+            update();
 
-        repaint();
+            repaint();
 
 
             try {
                 double remainingTime = nextDrawTime - System.nanoTime();
-                remainingTime = remainingTime/1000000;
+                remainingTime = remainingTime / 1000000;
 
-                if(remainingTime < 0) {
+                if (remainingTime < 0) {
                     remainingTime = 0;
                 }
                 Thread.sleep((long) remainingTime);
@@ -81,35 +91,67 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
     }
+
     public void update() {
 
-        if(gameState == playState){
+        if (gameState == playState) {
             player.update();
+            for (int i = 0; i < monster.length; i++) {
+                if (monster[i] != null) {
+                    monster[i].update();
+                }
+            }
         }
-        if(gameState == pauseState) {
+        if (gameState == pauseState) {
 
         }
     }
+
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D)g;
+        Graphics2D g2 = (Graphics2D) g;
 
         //TELA DE INICIO
-        if(gameState == titleState) {
+        if (gameState == titleState) {
             ui.draw(g2);
         }
-        //ESTADO DE PAUSA
-        else if (gameState == pauseState) {
+        else {
             tileM.draw(g2);
-            player.draw(g2);
-            ui.draw(g2);
-        }
-        else if (gameState == playState) {
-            tileM.draw(g2);
-            player.draw(g2);
-            ui.draw(g2);
-        }
+            entityList.add(player);
+            for (int i = 0; i < monster.length; i++) {
+                if (monster[i] != null) {
+                    entityList.add(monster[i]);
+                }
+            }
+            //SORT
+            Collections.sort(entityList, new Comparator<Entity>() {
+                @Override
+                public int compare(Entity e1, Entity e2) {
+                    int result = Integer.compare(e1.worldY, e2.worldY);
+                    return result;
+                }
+            });
+            //DESENHAR ENTIDADES
+            for (int i = 0; i < entityList.size(); i++) {
+                entityList.get(i).draw(g2);
+            }
+            // EMPTY ENTITY LIST
+            for (int i = 0; i < entityList.size(); i++) {
+                entityList.clear();
+            }
 
-        g2.dispose();
+            //ESTADO DE PAUSA
+            if (gameState == pauseState) {
+                tileM.draw(g2);
+                player.draw(g2);
+                ui.draw(g2);
+            } else if (gameState == playState) {
+                tileM.draw(g2);
+                player.draw(g2);
+                ui.draw(g2);
+            }
+
+            g2.dispose();
+        }
     }
 }

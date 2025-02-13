@@ -19,7 +19,7 @@ public class UI {
         arial_80B = new Font("Arial", Font.BOLD, 80);
 
         //CRIANDO HUD OBJECT
-        SuperObject heart = new OBJ_Heart(gp);
+        Entity heart = new OBJ_Heart(gp);
         vida_cheia = heart.image;
         vida_meia = heart.image2;
         sem_vida = heart.image3;
@@ -37,7 +37,6 @@ public class UI {
             drawPlayerLife();
         }
         if (gp.gameState == gp.pauseState) {
-            System.out.println("Jogo pausado");
             drawPlayerLife();
             drawPauseScreen();
         }
