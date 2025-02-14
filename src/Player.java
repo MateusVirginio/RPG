@@ -30,7 +30,7 @@ public class Player extends Entity{
         worldX = gp.tileSize * 12;
         worldY = gp.tileSize * 11;
         speed = 4;
-        direction = "down";
+        direction = "up";
 
         //STATUS DO PERSONAGEM
         maxlife = 6;
@@ -79,6 +79,10 @@ public class Player extends Entity{
             collisionOn = false;
             gp.Colisao.ChecarTile(this);
 
+            // Checar Colisao Do Monstro
+            int monsterIndex = gp.Colisao.checkEntity(this, gp.monster);
+            contactMonster(monsterIndex);
+
             // Se a colisao for falsa, o jogador pode se mover
             if (collisionOn == false) {
 
@@ -113,6 +117,23 @@ public class Player extends Entity{
             }
         }
     }
+    public void contactMonster(int i){
+        if(i != 999) {
+            if(invincible == false) {
+                life -= 1;
+                invincible = true;
+
+            }
+        }
+        if(invincible == true){
+            invincibleCounter++;
+            if(invincibleCounter > 60) {
+                invincible = false;
+                invincibleCounter = 0;
+            }
+        }
+    }
+
     public void draw(Graphics2D g2) {
 
         BufferedImage image = null;

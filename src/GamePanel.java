@@ -30,14 +30,14 @@ public class GamePanel extends JPanel implements Runnable {
     //SISTEMA
     TileManager tileM = new TileManager(this);
     public KeyHandler keyH = new KeyHandler(this);
-    Thread gameThread;
     public ChecarColisao Colisao = new ChecarColisao(this);
     public UI ui = new UI(this);
     public AssetSetter aSetter = new AssetSetter(this);
+    Thread gameThread;
 
     //ENTIDADES E OBJETOS
     public Player player = new Player(this, keyH);
-    public Entity monster[] = new Entity[10];
+    public Entity monster[] = new Entity[20];
     ArrayList<Entity> entityList = new ArrayList<>();
 
     //ESTADO DO JOGO
@@ -114,40 +114,32 @@ public class GamePanel extends JPanel implements Runnable {
         //TELA DE INICIO
         if (gameState == titleState) {
             ui.draw(g2);
-        }
-        else {
+        } else {
             tileM.draw(g2);
             entityList.add(player);
+            System.out.println("Jogador adicionado à entityList");
             for (int i = 0; i < monster.length; i++) {
                 if (monster[i] != null) {
                     entityList.add(monster[i]);
+                    System.out.println("Monstro " + i + " adicionado à entityList: " + monster[i].name);
                 }
             }
             //SORT
             Collections.sort(entityList, new Comparator<Entity>() {
                 @Override
                 public int compare(Entity e1, Entity e2) {
-                    int result = Integer.compare(e1.worldY, e2.worldY);
-                    return result;
+                    return Integer.compare(e1.worldY, e2.worldY);
                 }
             });
-            //DESENHAR ENTIDADES
+            // DESENHAR ENTIDADES
             for (int i = 0; i < entityList.size(); i++) {
                 entityList.get(i).draw(g2);
             }
-            // EMPTY ENTITY LIST
-            for (int i = 0; i < entityList.size(); i++) {
-                entityList.clear();
-            }
+            // LIMPAR A LISTA APÓS DESENHAR
+            entityList.clear(); // Limpa a lista uma única vez
 
             //ESTADO DE PAUSA
-            if (gameState == pauseState) {
-                tileM.draw(g2);
-                player.draw(g2);
-                ui.draw(g2);
-            } else if (gameState == playState) {
-                tileM.draw(g2);
-                player.draw(g2);
+            if (gameState == pauseState || gameState == playState) {
                 ui.draw(g2);
             }
 
