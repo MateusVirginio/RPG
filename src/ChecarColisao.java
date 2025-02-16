@@ -82,9 +82,9 @@ public class ChecarColisao {
 
                 switch (entity.direction) {
                     case "up": entity.solidArea.y -= entity.speed; break;
-                    case "down": entity.solidArea.y -= entity.speed; break;
-                    case "left": entity.solidArea.y -= entity.speed; break;
-                    case "right": entity.solidArea.y -= entity.speed; break;
+                    case "down": entity.solidArea.y += entity.speed; break;
+                    case "left": entity.solidArea.x -= entity.speed; break;
+                    case "right": entity.solidArea.x += entity.speed; break;
                 }
                 if (entity.solidArea.intersects(target[i].solidArea)) {
                     if(target[i] != entity){
@@ -115,7 +115,7 @@ public class ChecarColisao {
                 }
                 break;
             case "down":
-                entity.solidArea.y -= entity.speed;
+                entity.solidArea.y += entity.speed;
                 if (entity.solidArea.intersects(gp.player.solidArea)) {
                     entity.collisionOn = true;
                 }
@@ -127,13 +127,12 @@ public class ChecarColisao {
                 }
                 break;
             case "right":
-                entity.solidArea.y -= entity.speed;
+                entity.solidArea.y += entity.speed;
                 if (entity.solidArea.intersects(gp.player.solidArea)) {
                     entity.collisionOn = true;
                     break;
                 }
         }
-
         entity.solidArea.x = entity.solidAreaDefaultX;
         entity.solidArea.y = entity.solidAreaDefaultY;
         gp.player.solidArea.x = gp.player.solidAreaDefaultX;

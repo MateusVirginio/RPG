@@ -7,31 +7,36 @@ import java.util.Objects;
 public class Entity {
 
     GamePanel gp;
-    public int worldX, worldY;
-    public int speed;
-
-    public BufferedImage up1, up2, up3, down1, down2, down3, left1, left2, left3, right1, right2, right3;
-    public String direction = "down";
-
-    public int spriteCounter = 0;
-    public int spriteNum = 1;
-
+    public BufferedImage up1, up2, down1, down2, left1, left2, right1, right2;
+    public BufferedImage attackUp1, attackUp2, attackDown1, attackDown2,
+    attackLeft1, attackLeft2, attackRight1, attackRight2;
+    public boolean collision = false;
     public Rectangle solidArea;
-    public boolean collisionOn = false;
+    public Rectangle attackArea = new Rectangle(0, 0,0,0);
     public int solidAreaDefaultX, solidAreaDefaultY;
+    public BufferedImage image, image2, image3;
+    UtilityTool uTool = new UtilityTool();
 
-    public int actionLockCounter = 0;
+    //ESTADO
+    public int worldX, worldY;
+    public String direction = "down";
+    public int spriteNum = 1;
+    public boolean collisionOn = false;
+    public boolean attacking = false;
     public boolean invincible = false;
+
+    //CONTADOR
+    public int spriteCounter = 0;
+    public int actionLockCounter = 0;
     public int invincibleCounter = 0;
 
-    public BufferedImage image, image2, image3;
-    public String name;
-    public boolean collision = false;
-    UtilityTool uTool = new UtilityTool();
 
     //STATUS DO PERSONAGEM
     public int maxlife;
     public int life;
+    public String name;
+    public int speed;
+
 
     public Entity(GamePanel gp) {
         this.gp = gp;
@@ -40,7 +45,7 @@ public class Entity {
         solidAreaDefaultX = solidArea.x; // Salva a posição padrão X
         solidAreaDefaultY = solidArea.y; // Salva a posição padrão Y
     }
-    public BufferedImage setup(String imagePath) {
+    public BufferedImage setup(String imagePath, int width, int height) {
 
         UtilityTool uTool = new UtilityTool();
         BufferedImage image = null;
@@ -63,7 +68,7 @@ public class Entity {
             }
 
             // Redimensiona a imagem
-            image = uTool.scaleImage(image, gp.tileSize, gp.tileSize);
+            image = uTool.scaleImage(image, width, height);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -78,7 +83,7 @@ public class Entity {
         if (worldX + gp.tileSize > gp.player.worldX - gp.player.screenX &&
                 worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
                 worldY + gp.tileSize > gp.player.worldY - gp.player.screenY &&
-                worldY - gp.tileSize < gp.player.worldY - gp.player.screenY) {
+                worldY - gp.tileSize < gp.player.worldY + gp.player.screenY) {
 
             switch (direction) {
                 case "up":
@@ -98,6 +103,11 @@ public class Entity {
                     if (spriteNum == 2) image = right2;
                     break;
             }
+            if(invincible == true) {
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.4f));
+            }
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+
             if (image != null) {
                 g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
             } else {
@@ -139,13 +149,17 @@ public class Entity {
             if(spriteNum == 1) {
                 spriteNum = 2;
             }
-            if(spriteNum == 2) {
-                spriteNum = 3;
-            }
-            else if (spriteNum == 3) {
+            else if(spriteNum == 2) {
                 spriteNum = 1;
             }
             spriteCounter = 0;
+        }
+        if(invincible == true) {
+            invincibleCounter++;
+            if(invincibleCounter > 40){
+                invincible = false;
+                invincibleCounter = 0;
+            }
         }
     }
 }

@@ -4,8 +4,11 @@ import java.util.Random;
 
 public class MON_Skeleton extends Entity {
 
+    GamePanel gp;
+
     public MON_Skeleton(GamePanel gp){
         super(gp);
+        this.gp = gp;
 
         name = "Esqueleto";
         speed = 1;
@@ -23,14 +26,14 @@ public class MON_Skeleton extends Entity {
     }
     public void getImage() {
 
-            up1 = setup("/monstros/skeleton_right1");
-            up2 = setup("/monstros/skeleton_right2");
-            down1 = setup("/monstros/skeleton_down1");
-            down2 = setup("/monstros/skeleton_down2");
-            right1 = setup("/monstros/skeleton_right1");
-            right2 = setup("/monstros/skeleton_right2");
-            left1 = setup("/monstros/skeleton_left1");
-            left2 = setup("/monstros/skeleton_left2");
+            up1 = setup("/monstros/skeleton_right1",gp.tileSize, gp.tileSize);
+            up2 = setup("/monstros/skeleton_right2",gp.tileSize, gp.tileSize);
+            down1 = setup("/monstros/skeleton_down1",gp.tileSize, gp.tileSize);
+            down2 = setup("/monstros/skeleton_down2",gp.tileSize, gp.tileSize);
+            right1 = setup("/monstros/skeleton_right1",gp.tileSize, gp.tileSize);
+            right2 = setup("/monstros/skeleton_right2",gp.tileSize, gp.tileSize);
+            left1 = setup("/monstros/skeleton_left1",gp.tileSize, gp.tileSize);
+            left2 = setup("/monstros/skeleton_left2",gp.tileSize, gp.tileSize);
 
         System.out.println("Imagens do esqueleto carregadas:");
         System.out.println("up1: " + (up1 != null ? "OK" : "Falha"));

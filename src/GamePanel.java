@@ -117,11 +117,11 @@ public class GamePanel extends JPanel implements Runnable {
         } else {
             tileM.draw(g2);
             entityList.add(player);
-            System.out.println("Jogador adicionado à entityList");
+            //System.out.println("Jogador adicionado à entityList");
             for (int i = 0; i < monster.length; i++) {
                 if (monster[i] != null) {
                     entityList.add(monster[i]);
-                    System.out.println("Monstro " + i + " adicionado à entityList: " + monster[i].name);
+                    //System.out.println("Monstro " + i + " adicionado à entityList: " + monster[i].name);
                 }
             }
             //SORT
@@ -139,11 +139,11 @@ public class GamePanel extends JPanel implements Runnable {
             entityList.clear(); // Limpa a lista uma única vez
 
             //ESTADO DE PAUSA
-            if (gameState == pauseState || gameState == playState) {
-                ui.draw(g2);
+            //if (gameState == pauseState || gameState == playState) {
+            ui.draw(g2);
             }
 
             g2.dispose();
         }
     }
-}
+

@@ -4,8 +4,8 @@ public class OBJ_Heart extends Entity{
         super(gp);
 
         name = "Heart";
-        image = setup("/objetos/vida_cheia");
-        image2 = setup("/objetos/vida_meia");
-        image3 = setup("/objetos/sem_vida");
+        image = setup("/objetos/vida_cheia",gp.tileSize, gp.tileSize);
+        image2 = setup("/objetos/vida_meia",gp.tileSize, gp.tileSize);
+        image3 = setup("/objetos/sem_vida",gp.tileSize, gp.tileSize);
     }
 }
