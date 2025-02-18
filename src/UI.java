@@ -62,7 +62,6 @@ public class UI {
     }
         public void drawPlayerLife () {
 
-            gp.player.life = 6;
 
             int x = gp.tileSize / 2;
             int y = gp.tileSize / 2;
@@ -70,23 +69,15 @@ public class UI {
 
             //VIDA CHEIA
             while (i < gp.player.maxlife / 2) {
-                g2.drawImage(vida_cheia, x, y, null);
-                i++;
-                x += gp.tileSize;
-            }
-            //RESETA
-            x = gp.tileSize / 2;
-            y = gp.tileSize / 2;
-            i = 0;
-            //VIDA ATUAL
-            while (i < gp.player.life) {
-                g2.drawImage(vida_meia, x, y, null);
-                i++;
-                if (i < gp.player.life) {
-                    g2.drawImage(vida_cheia, x, y, null);
+                if (i < gp.player.life / 2) {
+                    g2.drawImage(vida_cheia, x, y, null); // Coração cheio
+                } else if (i == gp.player.life / 2 && gp.player.life % 2 == 1) {
+                    g2.drawImage(vida_meia, x, y, null); // Meio coração
+                } else {
+                    g2.drawImage(sem_vida, x, y, null); // Coração vazio
                 }
                 i++;
-                x += gp.tileSize;
+                x += gp.tileSize; // Move para a próxima posição
             }
 
         }

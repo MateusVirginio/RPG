@@ -70,62 +70,74 @@ public class Player extends Entity {
     public void update() {
 
         if (gp.keyH.enterPressed == true && attacking == false) {
-            attacking = true; // Ativa o estado de ataque
-            gp.keyH.enterPressed = false; // Reseta o estado da tecla Enter
+            if (!keyH.upPressed && !keyH.downPressed && !keyH.leftPressed && !keyH.rightPressed) {
+                attacking = true; // Ativa o estado de ataque
+                gp.keyH.enterPressed = false; // Reseta o estado da tecla Enter
+            }
         }
-        if (attacking == true) {
+        if (!attacking) {
+
+            if (keyH.upPressed == true || keyH.downPressed == true ||
+                    keyH.leftPressed == true || keyH.rightPressed == true) {
+
+                if (keyH.upPressed == true) {
+                    direction = "up";
+                } else if (keyH.downPressed == true) {
+                    direction = "down";
+                } else if (keyH.leftPressed == true) {
+                    direction = "left";
+                } else if (keyH.rightPressed == true) {
+                    direction = "right";
+                }
+                // Checar Colisao Do Tile
+                collisionOn = false;
+                gp.Colisao.ChecarTile(this);
+
+                // Checar Colisao Do Monstro
+                int monsterIndex = gp.Colisao.checkEntity(this, gp.monster);
+                contactMonster(monsterIndex);
+
+                // Se a colisao for falsa, o jogador pode se mover
+                if (collisionOn == false) {
+
+                    switch (direction) {
+                        case "up":
+                            worldY -= speed;
+                            break;
+                        case "down":
+                            worldY += speed;
+                            break;
+                        case "left":
+                            worldX -= speed;
+                            break;
+                        case "right":
+                            worldX += speed;
+                            break;
+                    }
+                }
+
+                spriteCounter++;
+                if (spriteCounter > 12) {
+                    if (spriteNum == 1) {
+                        spriteNum = 2;
+                    } else if (spriteNum == 2) {
+                        spriteNum = 1;
+                    }
+                    spriteCounter = 0;
+                }
+            }
+        }
+        if (attacking) {
             attacking();
         }
-        if (keyH.upPressed == true || keyH.downPressed == true ||
-                keyH.leftPressed == true || keyH.rightPressed == true) {
-
-            if (keyH.upPressed == true) {
-                direction = "up";
-            } else if (keyH.downPressed == true) {
-                direction = "down";
-            } else if (keyH.leftPressed == true) {
-                direction = "left";
-            } else if (keyH.rightPressed == true) {
-                direction = "right";
-            }
-            // Checar Colisao Do Tile
-            collisionOn = false;
-            gp.Colisao.ChecarTile(this);
-
-            // Checar Colisao Do Monstro
-            int monsterIndex = gp.Colisao.checkEntity(this, gp.monster);
-
-            // Se a colisao for falsa, o jogador pode se mover
-            if (collisionOn == false) {
-
-                switch (direction) {
-                    case "up":
-                        worldY -= speed;
-                        break;
-                    case "down":
-                        worldY += speed;
-                        break;
-                    case "left":
-                        worldX -= speed;
-                        break;
-                    case "right":
-                        worldX += speed;
-                        break;
-                }
-            }
-
-            spriteCounter++;
-            if (spriteCounter > 12) {
-                if (spriteNum == 1) {
-                    spriteNum = 2;
-                } else if (spriteNum == 2) {
-                    spriteNum = 1;
-                }
-                spriteCounter = 0;
+        if(invincible == true){
+            invincibleCounter++;
+            if(invincibleCounter > 60) {
+                invincible = false;
+                invincibleCounter = 0;
             }
         }
     }
-
     public void attacking() {
 
         spriteCounter++;
@@ -164,15 +176,23 @@ public class Player extends Entity {
             attacking = false;
         }
     }
-
+    public void contactMonster(int i){
+        if(i != 999) {
+            if(invincible == false) {
+                life -= 1;
+                invincible = true;
+            }
+        }
+    }
     public void damageMonster(int i){
         if(i != 999) {
             if (gp.monster[i].invincible == false) {
                 gp.monster[i].life -= 1;
                 gp.monster[i].invincible = true;
+                gp.monster[i].damageReaction();
 
                 if (gp.monster[i].life <= 0) {
-                    gp.monster[i] = null;
+                    gp.monster[i].dying = true;
                 }
             }
         }

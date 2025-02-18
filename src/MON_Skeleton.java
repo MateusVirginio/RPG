@@ -10,6 +10,7 @@ public class MON_Skeleton extends Entity {
         super(gp);
         this.gp = gp;
 
+        type = 1;
         name = "Esqueleto";
         speed = 1;
         maxlife = 5;
@@ -35,15 +36,6 @@ public class MON_Skeleton extends Entity {
             left1 = setup("/monstros/skeleton_left1",gp.tileSize, gp.tileSize);
             left2 = setup("/monstros/skeleton_left2",gp.tileSize, gp.tileSize);
 
-        System.out.println("Imagens do esqueleto carregadas:");
-        System.out.println("up1: " + (up1 != null ? "OK" : "Falha"));
-        System.out.println("up2: " + (up2 != null ? "OK" : "Falha"));
-        System.out.println("down1: " + (down1 != null ? "OK" : "Falha"));
-        System.out.println("down2: " + (down2 != null ? "OK" : "Falha"));
-        System.out.println("right1: " + (right1 != null ? "OK" : "Falha"));
-        System.out.println("right2: " + (right2 != null ? "OK" : "Falha"));
-        System.out.println("left1: " + (left1 != null ? "OK" : "Falha"));
-        System.out.println("left2: " + (left2 != null ? "OK" : "Falha"));
     }
     public void setAction() {
 
