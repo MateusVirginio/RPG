@@ -15,11 +15,11 @@ public class TileManager {
     public TileManager(GamePanel gp) {
         this.gp = gp;
 
-        tile = new Tile[10];
+        tile = new Tile[100];
         mapTileNum = new int[gp.maxWorldCol][gp.maxWorldRow];
 
         getTileImage();
-        carregarMapa("/maps/map03.txt");
+        carregarMapa("/maps/map04.txt");
     }
 
     public void getTileImage() {
@@ -73,21 +73,20 @@ public class TileManager {
             int col  = 0;
             int row = 0;
 
-            while (col < gp.maxScreenCol && row < gp.maxScreenRow) {
+            while (row < gp.maxScreenRow) {
                 String line = br.readLine();
-                while(col < gp.maxScreenCol) {
-                    String numbers[] = line.split(" ");
+                if (line == null) break;
+
+                String[] numbers = line.split(" ");
+                for(col = 0; col < gp.maxScreenCol && col < numbers.length; col++){
                     int num = Integer.parseInt(numbers[col]);
                     mapTileNum[col][row] = num;
-                    col++;
                 }
-                if(col == gp.maxScreenCol) {
-                    col = 0;
-                    row++;
-                }
+                row++;
             }
             br.close();
         }catch(Exception e) {
+            e.printStackTrace();
 
         }
     }

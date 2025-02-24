@@ -88,7 +88,7 @@ public class UI {
 
             //TITULO DA JANELA
             g2.setFont(g2.getFont().deriveFont(Font.BOLD, 60F));
-            String text = "CLEITON RASTA: A PEDRA FILOSOFAL";
+            String text = "RPG";
 
             int x = getXforCenteredText(text);
             int y = gp.tileSize * 3;
