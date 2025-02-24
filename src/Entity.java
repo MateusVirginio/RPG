@@ -28,8 +28,8 @@ public class Entity {
     public boolean alive = true;
     public boolean dying = false;
     public boolean hpBarOn = false;
-    public int chaseSpeed = 2;
-    public int attackRange = gp.tileSize;
+    public int chaseSpeed;
+    public int attackRange;
     public int visible_range = 200;
     //CONTADOR
     public int spriteCounter = 0;
@@ -53,8 +53,10 @@ public class Entity {
         solidAreaDefaultX = solidArea.x; // Salva a posição padrão X
         solidAreaDefaultY = solidArea.y; // Salva a posição padrão Y
 
+        this.speed = 2;
         chaseSpeed = speed * 2;
-        attackRange = gp.tileSize;
+        this.attackRange = gp.tileSize;
+
     }
 
     public BufferedImage setup(String imagePath, int width, int height) {
@@ -231,27 +233,31 @@ public class Entity {
             attackPlayer();
         } else {
             // Caso contrário, move-se em direção ao jogador com velocidade aumentada
-            if (gp.player.worldX > this.worldX) {
-                this.worldX += chaseSpeed;
-                direction = "right";// Move para a direita
-            } else if (gp.player.worldX < this.worldX) {
-                this.worldX -= chaseSpeed;
-                direction = "left";// Move para a esquerda
-            }
-
-            if (gp.player.worldY > this.worldY) {
-                this.worldY += chaseSpeed;// Move para baixo
-                direction = "down";
-            } else if (gp.player.worldY < this.worldY) {
-                this.worldY -= chaseSpeed; // Move para cima
-                direction = "up";
+            int deltaX = gp.player.worldX - this.worldX;
+            int deltaY = gp.player.worldY - this.worldY;
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                if (deltaX > 0) {
+                    this.worldX += chaseSpeed;
+                    direction = "right"; // Move para a direita
+                } else {
+                    this.worldX -= chaseSpeed;
+                    direction = "left"; // Move para a esquerda
+                }
+            } else {
+                if (deltaY > 0) {
+                    this.worldY += chaseSpeed;
+                    direction = "down"; // Move para baixo
+                } else {
+                    this.worldY -= chaseSpeed;
+                    direction = "up"; // Move para cima
+                }
             }
         }
     }
 
     public void attackPlayer() {
         // Lógica para atacar o jogador
-        if (gp.player.invincible == false) {
+        if (!gp.player.invincible) {
             gp.player.life -= 1; // Reduz a vida do jogador
             gp.player.invincible = true; // Torna o jogador invencível temporariamente
             System.out.println(name + " atacou o jogador!");
