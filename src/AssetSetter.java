@@ -5,19 +5,30 @@ public class AssetSetter {
     public AssetSetter(GamePanel gp) {
         this.gp = gp;
     }
+    public void setNpc() {
 
+        int mapNum = 0;
+        int i = 0;
+        gp.npc[mapNum][i] = new Npc(gp);
+        gp.npc[mapNum][i].worldX = gp.tileSize*8;
+        gp.npc[mapNum][i].worldY = gp.tileSize*8;
+        i++;
+    }
     public void setMonster() {
-        gp.monster[0] = new MON_Skeleton(gp);
-        gp.monster[0].worldX = gp.tileSize*6;
-        gp.monster[0].worldY = gp.tileSize*5;
 
-        gp.monster[1] = new MON_Skeleton(gp);
-        gp.monster[1].worldX = gp.tileSize*7;
-        gp.monster[1].worldY = gp.tileSize*4;
-
-        gp.monster[2] = new MON_Skeleton(gp);
-        gp.monster[2].worldX = gp.tileSize*9;
-        gp.monster[2].worldY = gp.tileSize*4;
-
+        int mapNum = 1;
+        int i = 0;
+        gp.monster[mapNum][i] = new MON_Skeleton(gp);
+        gp.monster[mapNum][i].worldX = gp.tileSize*6;
+        gp.monster[mapNum][i].worldY = gp.tileSize*5;
+        i++;
+        gp.monster[mapNum][i] = new MON_Skeleton(gp);
+        gp.monster[mapNum][i].worldX = gp.tileSize*7;
+        gp.monster[mapNum][i].worldY = gp.tileSize*4;
+        i++;
+        gp.monster[mapNum][i] = new MON_Skeleton(gp);
+        gp.monster[mapNum][i].worldX = gp.tileSize*9;
+        gp.monster[mapNum][i].worldY = gp.tileSize*4;
+        i++;
     }
 }

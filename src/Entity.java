@@ -2,7 +2,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Objects;
 
 public class Entity {
 
@@ -17,6 +16,8 @@ public class Entity {
     public BufferedImage image, image2, image3;
     UtilityTool uTool = new UtilityTool();
     public int type;// 0 - Player. 1 - Monster
+    public String dialogues[] = new String[20];
+    public int dialogueIndex = 0;
 
     //ESTADO
     public int worldX, worldY;
@@ -56,7 +57,6 @@ public class Entity {
         this.speed = 2;
         chaseSpeed = speed * 2;
         this.attackRange = gp.tileSize;
-
     }
 
     public BufferedImage setup(String imagePath, int width, int height) {
@@ -138,12 +138,12 @@ public class Entity {
                 }
             }
 
-            if (invincible == true) {
+            if (invincible) {
                 hpBarOn = true;
                 hpBarCounter = 0;
                 changeAlpha(g2, 0.4f);
             }
-            if (dying == true) {
+            if (dying) {
                 dyingAnimation(g2);
             }
             changeAlpha(g2, 1f);
@@ -193,84 +193,15 @@ public class Entity {
     public void changeAlpha(Graphics2D g2, float alphaValue) {
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alphaValue));
     }
-
-
     public void setAction() {
-        if (this.type == 1) { // Verifica se é um monstro
-            if (canSeePlayer()) {
-                moveTowardsPlayer(); // Persegue o jogador
-            } else {
-                // Comportamento padrão (opcional)
-                direction = "down"; // Ou qualquer outra direção padrão
-            }
-        }
-    }
-    public boolean canSeePlayer() {
-        double distanceToPlayer = calculateDistancePlayer();
-        return distanceToPlayer < visible_range; // Verifica se o jogador está dentro do raio de visão
+
     }
 
-    public void damageReaction() {
-        actionLockCounter = 0;
-        direction = gp.player.direction;
-        if (canSeePlayer()) {
-            moveTowardsPlayer();
-        }
-    }
-
-    public double calculateDistancePlayer() {
-        int deltaX = gp.player.worldX - this.worldX;
-        int deltaY = gp.player.worldY - this.worldY;
-        return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-    }
-
-    public void moveTowardsPlayer() {
-        // Verifica a distância até o jogador
-        double distanceToPlayer = calculateDistancePlayer();
-
-        // Se o monstro estiver dentro do alcance de ataque, ataca o jogador
-        if (distanceToPlayer <= attackRange) {
-            attackPlayer();
-        } else {
-            // Caso contrário, move-se em direção ao jogador com velocidade aumentada
-            int deltaX = gp.player.worldX - this.worldX;
-            int deltaY = gp.player.worldY - this.worldY;
-            if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                if (deltaX > 0) {
-                    this.worldX += chaseSpeed;
-                    direction = "right"; // Move para a direita
-                } else {
-                    this.worldX -= chaseSpeed;
-                    direction = "left"; // Move para a esquerda
-                }
-            } else {
-                if (deltaY > 0) {
-                    this.worldY += chaseSpeed;
-                    direction = "down"; // Move para baixo
-                } else {
-                    this.worldY -= chaseSpeed;
-                    direction = "up"; // Move para cima
-                }
-            }
-        }
-    }
-
-    public void attackPlayer() {
-        // Lógica para atacar o jogador
-        if (!gp.player.invincible) {
-            gp.player.life -= 1; // Reduz a vida do jogador
-            gp.player.invincible = true; // Torna o jogador invencível temporariamente
-            System.out.println(name + " atacou o jogador!");
-        }
-    }
     public void update() {
 
-        if (this.type == 1) {
-            setAction();
-        }
-
+        setAction();
         collisionOn = false;
-        gp.Colisao.ChecarTile(this);
+        gp.Colisao.checkTile(this);
         gp.Colisao.checkEntity(this, gp.monster);
         boolean contactPlayer = gp.Colisao.checkPlayer(this);
 
@@ -314,6 +245,22 @@ public class Entity {
                 invincible = false;
                 invincibleCounter = 0;
             }
+        }
+    }
+
+    public void speak() {
+
+        if (dialogues[dialogueIndex] == null) {
+            dialogueIndex = 0;
+        }
+        gp.ui.currentDialogue = dialogues[dialogueIndex];
+        dialogueIndex++;
+
+        switch (gp.player.direction) {
+            case "up": direction = "down"; break;
+            case "down": direction = "up"; break;
+            case "left": direction = "right"; break;
+            case "right": direction = "left"; break;
         }
     }
 }

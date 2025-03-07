@@ -1,5 +1,3 @@
-import javax.imageio.ImageIO;
-import java.io.IOException;
 import java.util.Random;
 
 public class MON_Skeleton extends Entity {
@@ -27,8 +25,8 @@ public class MON_Skeleton extends Entity {
     }
     public void getImage() {
 
-            up1 = setup("/monstros/skeleton_right1",gp.tileSize, gp.tileSize);
-            up2 = setup("/monstros/skeleton_right2",gp.tileSize, gp.tileSize);
+            up1 = setup("/monstros/skeleton_up1",gp.tileSize, gp.tileSize);
+            up2 = setup("/monstros/skeleton_up2",gp.tileSize, gp.tileSize);
             down1 = setup("/monstros/skeleton_down1",gp.tileSize, gp.tileSize);
             down2 = setup("/monstros/skeleton_down2",gp.tileSize, gp.tileSize);
             right1 = setup("/monstros/skeleton_right1",gp.tileSize, gp.tileSize);

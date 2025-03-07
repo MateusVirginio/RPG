@@ -1,7 +1,5 @@
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 public class Player extends Entity {
 
@@ -20,8 +18,8 @@ public class Player extends Entity {
         screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
         screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
 
-        attackArea.width = 36;
-        attackArea.height = 36;
+        attackArea.width = 46;
+        attackArea.height = 46;
 
         setDefaultValues();
         getPlayerImage();
@@ -29,7 +27,17 @@ public class Player extends Entity {
 
         solidArea = new Rectangle(8, 16, 32, 32);
     }
+    public void setDefaultPositions() {
 
+        worldX = gp.tileSize * 12;
+        worldY = gp.tileSize * 11;
+        direction = "up";
+    }
+    public void restoreLife() {
+
+        life = maxlife;
+        invincible = false;
+    }
     public void setDefaultValues() {
 
         worldX = gp.tileSize * 12;
@@ -41,7 +49,6 @@ public class Player extends Entity {
         maxlife = 6;
         life = maxlife;
     }
-
     public void getPlayerImage() {
 
         up1 = setup("/player/boy_up_1",gp.tileSize, gp.tileSize);
@@ -54,7 +61,6 @@ public class Player extends Entity {
         right2 = setup("/player/boy_right_2",gp.tileSize, gp.tileSize);
 
     }
-
     public void getPlayerAttackImage() {
 
         attackUp1 = setup("/player/boy_attack_up_1", gp.tileSize, gp.tileSize);
@@ -66,7 +72,6 @@ public class Player extends Entity {
         attackRight1 = setup("/player/boy_attack_right_1", gp.tileSize , gp.tileSize);
         attackRight2 = setup("/player/boy_attack_right_2", gp.tileSize , gp.tileSize);
     }
-
     public void update() {
 
         if (gp.keyH.enterPressed == true && attacking == false) {
@@ -91,11 +96,18 @@ public class Player extends Entity {
                 }
                 // Checar Colisao Do Tile
                 collisionOn = false;
-                gp.Colisao.ChecarTile(this);
+                gp.Colisao.checkTile(this);
 
                 // Checar Colisao Do Monstro
                 int monsterIndex = gp.Colisao.checkEntity(this, gp.monster);
                 contactMonster(monsterIndex);
+
+                //Checar Evento
+                gp.event.checkEvent();
+
+                //Checar Colisao Do Npc
+                int npcIndex = gp.Colisao.checkEntity(this, gp.npc);
+                interactNpc(npcIndex);
 
                 // Se a colisao for falsa, o jogador pode se mover
                 if (collisionOn == false) {
@@ -130,18 +142,30 @@ public class Player extends Entity {
         if (attacking) {
             attacking();
         }
-        if(invincible == true){
+        if (invincible == true){
             invincibleCounter++;
             if(invincibleCounter > 60) {
                 invincible = false;
                 invincibleCounter = 0;
             }
         }
+       if (life <= 0) {
+           gp.gameState = gp.gameOverState;
+       }
+    }
+    public void interactNpc(int i) {
+
+        if (i != 999) {
+            if (gp.keyH.enterPressed) {
+                gp.gameState = gp.dialogueState;
+                gp.npc[gp.currentMap][i].speak();
+            }
+        }
+        gp.keyH.enterPressed = false;
     }
     public void attacking() {
 
         spriteCounter++;
-
         if (spriteCounter <= 5) {
             spriteNum = 1;
         }
@@ -176,9 +200,10 @@ public class Player extends Entity {
             attacking = false;
         }
     }
+
     public void contactMonster(int i){
-        if(i != 999) {
-            if(invincible == false) {
+        if (i != 999 && gp.monster[gp.currentMap][i] != null) {
+            if (invincible == false && gp.monster[gp.currentMap][i].invincible == false && !gp.monster[gp.currentMap][i].dying) {
                 life -= 1;
                 invincible = true;
             }
@@ -186,14 +211,14 @@ public class Player extends Entity {
     }
     public void damageMonster(int i){
         if(i != 999) {
-            if (gp.monster[i].invincible == false) {
-                gp.monster[i].life -= 1;
-                gp.monster[i].invincible = true;
-                gp.monster[i].damageReaction();
+            if (gp.monster[gp.currentMap][i].invincible == false) {
+                gp.monster[gp.currentMap][i].life -= 1;
+                gp.monster[gp.currentMap][i].invincible = true;
+                gp.monster[gp.currentMap][i].invincibleCounter = 0;
+               // gp.monster[gp.currentMap][i].damageReaction();
 
-                if (gp.monster[i].life <= 0) {
-                    gp.monster[i].dying = true;
-                }
+                if (gp.monster[gp.currentMap][i].life <= 0) {
+                    gp.monster[gp.currentMap][i].dying = true;}
             }
         }
     }
