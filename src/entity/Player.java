@@ -15,6 +15,7 @@ public class Player extends Entity {
     public final int screenY;
 
     public Player(GamePanel gp, KeyHandler keyH) {
+
         super(gp);
 
         this.gp = gp;
@@ -32,12 +33,14 @@ public class Player extends Entity {
 
         solidArea = new Rectangle(8, 16, 32, 32);
     }
+
     public void setDefaultPositions() {
 
         worldX = gp.tileSize * 12;
         worldY = gp.tileSize * 11;
         direction = "up";
     }
+
     public void restoreLife() {
 
         life = maxlife;
@@ -54,6 +57,7 @@ public class Player extends Entity {
         maxlife = 6;
         life = maxlife;
     }
+
     public void getPlayerImage() {
 
         up1 = setup("/player/boy_up_1",gp.tileSize, gp.tileSize);
@@ -66,6 +70,7 @@ public class Player extends Entity {
         right2 = setup("/player/boy_right_2",gp.tileSize, gp.tileSize);
 
     }
+
     public void getPlayerAttackImage() {
 
         attackUp1 = setup("/player/boy_attack_up_1", gp.tileSize, gp.tileSize);
@@ -77,6 +82,7 @@ public class Player extends Entity {
         attackRight1 = setup("/player/boy_attack_right_1", gp.tileSize , gp.tileSize);
         attackRight2 = setup("/player/boy_attack_right_2", gp.tileSize , gp.tileSize);
     }
+
     public void update() {
 
         if (gp.keyH.enterPressed == true && attacking == false) {
@@ -158,6 +164,7 @@ public class Player extends Entity {
            gp.gameState = gp.gameOverState;
        }
     }
+
     public void interactNpc(int i) {
 
         if (i != 999) {
@@ -168,6 +175,7 @@ public class Player extends Entity {
         }
         gp.keyH.enterPressed = false;
     }
+
     public void attacking() {
 
         spriteCounter++;
@@ -207,6 +215,7 @@ public class Player extends Entity {
     }
 
     public void contactMonster(int i){
+
         if (i != 999 && gp.monster[gp.currentMap][i] != null) {
             if (invincible == false && gp.monster[gp.currentMap][i].invincible == false && !gp.monster[gp.currentMap][i].dying) {
                 life -= 1;
@@ -214,19 +223,22 @@ public class Player extends Entity {
             }
         }
     }
+
     public void damageMonster(int i){
+
         if(i != 999) {
             if (gp.monster[gp.currentMap][i].invincible == false) {
                 gp.monster[gp.currentMap][i].life -= 1;
                 gp.monster[gp.currentMap][i].invincible = true;
                 gp.monster[gp.currentMap][i].invincibleCounter = 0;
-               // gp.monster[gp.currentMap][i].damageReaction();
+                gp.monster[gp.currentMap][i].damageReaction();
 
                 if (gp.monster[gp.currentMap][i].life <= 0) {
                     gp.monster[gp.currentMap][i].dying = true;}
             }
         }
     }
+
     public void draw(Graphics2D g2) {
 
         BufferedImage image = null;

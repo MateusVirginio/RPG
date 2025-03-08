@@ -20,6 +20,7 @@ public class UI {
     public String currentDialogue = "";
 
     public UI(GamePanel gp) {
+
         this.gp = gp;
 
         arial_40 = new Font("Arial", Font.PLAIN, 40);
@@ -30,7 +31,6 @@ public class UI {
         vida_cheia = heart.image;
         vida_meia = heart.image2;
         sem_vida = heart.image3;
-
     }
 
     public void draw(Graphics2D g2) {
@@ -84,6 +84,7 @@ public class UI {
             x += gp.tileSize; // Move para a próxima posição
         }
     }
+
     public void drawDialogueScreen() {
 
         //JANELA
@@ -102,6 +103,7 @@ public class UI {
             y += 40;
         }
     }
+
     public void drawTitleScreen() {
 
         g2.setColor(new Color(0, 0, 0));
@@ -109,7 +111,7 @@ public class UI {
 
         //TITULO DA JANELA
         g2.setFont(g2.getFont().deriveFont(Font.BOLD, 60F));
-        String text = "RPG";
+        String text = "ShadowBlade";
 
         int x = getXforCenteredText(text);
         int y = gp.tileSize * 3;
@@ -149,6 +151,7 @@ public class UI {
 
         }
     }
+
     public void drawGameOverScreen() {
 
         g2.setColor(new Color(0,0,0,150));
@@ -187,7 +190,9 @@ public class UI {
             g2.drawString(">", x-40, y);
         }
     }
+
     public void drawOptionsScreen() {
+
         g2.setColor(white);
         g2.setFont(g2.getFont().deriveFont(32F));
 
@@ -206,7 +211,9 @@ public class UI {
         }
         gp.keyH.enterPressed = false;
     }
+
     public void optionsTop(int frameX, int frameY){
+
         int textX;
         int textY;
 
@@ -274,7 +281,9 @@ public class UI {
 
         gp.config.saveConfig();
     }
+
     public void optionsControl(int frameX, int frameY) {
+
         int textX;
         int textY;
 
@@ -308,7 +317,9 @@ public class UI {
             }
         }
     }
+
     public void optionsEndGame(int frameX, int frameY) {
+
         int textX = frameX + gp.tileSize;
         int textY = frameY + gp.tileSize*3;
 
@@ -328,6 +339,7 @@ public class UI {
             if (gp.keyH.enterPressed == true) {
                 subState = 0;
                 gp.gameState = gp.titleState;
+                gp.saveLoad.save();
             }
         }
         //Não
@@ -343,7 +355,9 @@ public class UI {
             }
         }
     }
+
     public void optionsFullScreenNotification ( int frameX, int frameY){
+
         int textX = frameX + gp.tileSize;
         int textY = frameY + gp.tileSize * 3;
 
@@ -363,6 +377,7 @@ public class UI {
             }
         }
     }
+
     public void drawTransition() {
 
         counter++;
@@ -380,7 +395,9 @@ public class UI {
 
         }
     }
+
     public void drawSubWindow(int x, int y, int width, int height) {
+
         Color c = new Color(0,0,0,210);
         g2.setColor(c);
         g2.fillRoundRect(x, y, width, height, 35, 35);
@@ -391,7 +408,9 @@ public class UI {
         g2.drawRoundRect(x+5, y+5, width-10, height-10, 25, 25); // Desenha a borda da subjanela
 
     }
+
     public int getXforCenteredText(String text) {
+
         int length = (int) g2.getFontMetrics().getStringBounds(text, g2).getWidth();
         int x = gp.screenWidth / 2 - length / 2;
         return x;

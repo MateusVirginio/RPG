@@ -1,5 +1,7 @@
 package main;
 
+import ai.PathFinder;
+import data.SaveLoad;
 import entity.Entity;
 import entity.Player;
 import tile.TileManager;
@@ -40,12 +42,14 @@ public class GamePanel extends JPanel implements Runnable {
     int FPS = 60;
 
     //SISTEMA
-    TileManager tileM = new TileManager(this);
+    public TileManager tileM = new TileManager(this);
     public KeyHandler keyH = new KeyHandler(this);
     public CheckCollision Colisao = new CheckCollision(this);
     public UI ui = new UI(this);
     public main.Event event = new Event(this);
     public AssetSetter aSetter = new AssetSetter(this);
+    public PathFinder pFinder = new PathFinder(this);
+    public SaveLoad saveLoad = new SaveLoad(this);
     Config config = new Config(this);
     Thread gameThread;
 
@@ -67,16 +71,16 @@ public class GamePanel extends JPanel implements Runnable {
 
 
     public GamePanel() {
+
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
-
-
     }
 
     public void setFullScreen() {
+
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         double width = screenSize.getWidth();
         double height = screenSize.getHeight();
@@ -86,6 +90,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void setupGame() {
+
         aSetter.setMonster();
         aSetter.setNpc();
         gameState = titleState;
@@ -96,6 +101,7 @@ public class GamePanel extends JPanel implements Runnable {
             setFullScreen();
         }
     }
+
     public void retry() {
 
         currentMap = 0;
@@ -104,6 +110,7 @@ public class GamePanel extends JPanel implements Runnable {
         aSetter.setNpc();
         aSetter.setMonster();
     }
+
     public void restart() {
 
         currentMap = 0;
@@ -113,7 +120,10 @@ public class GamePanel extends JPanel implements Runnable {
         aSetter.setNpc();
         aSetter.setMonster();
     }
+
     public void startGameThread() {
+
+        saveLoad.load();
         gameThread = new Thread(this);
         gameThread.start();
     }
@@ -168,7 +178,9 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
     }
+
     public void drawToTempScreen() {
+
         g2.clearRect(0, 0, screenWidth2, screenHeight2);
         if (gameState == titleState) {
             ui.draw(g2);
@@ -207,6 +219,7 @@ public class GamePanel extends JPanel implements Runnable {
             }
 
     public void drawToScreen() {
+
         Graphics g = getGraphics();
         g.drawImage(tempScreen, 0, 0, screenWidth2, screenHeight2, null);
         g.dispose();

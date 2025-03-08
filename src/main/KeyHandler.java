@@ -9,6 +9,7 @@ public class KeyHandler implements KeyListener {
     public boolean upPressed, downPressed, leftPressed, rightPressed, enterPressed;
 
     public KeyHandler(GamePanel gp) {
+
         this.gp = gp;
 
     }
@@ -19,6 +20,7 @@ public class KeyHandler implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+
         int code = e.getKeyCode();
 
         //ESTADO DO TITULO
@@ -38,7 +40,9 @@ public class KeyHandler implements KeyListener {
             gameOverState(code);
         }
     }
+
     public void titleState(int code) {
+
         if (code == KeyEvent.VK_W) {
             gp.ui.commandNum--;
             if (gp.ui.commandNum < 0) {
@@ -57,13 +61,15 @@ public class KeyHandler implements KeyListener {
                 gp.restart();
             }
             if (gp.ui.commandNum == 1) {
-
+                gp.saveLoad.load();
+                gp.gameState = gp.playState;
             }
             if (gp.ui.commandNum == 2) {
                 System.exit(0);
             }
         }
     }
+
     public void playState(int code) {
         if (code == KeyEvent.VK_W) {
             upPressed = true;
@@ -84,19 +90,23 @@ public class KeyHandler implements KeyListener {
             gp.gameState = gp.optionState;
         }
         if (code == KeyEvent.VK_R) {
+            //gp.saveLoad.save();
             switch (gp.currentMap) {
                 case 0: gp.tileM.loadMap("/maps/map04.txt",0);
                 case 1: gp.tileM.loadMap("/maps/teste_s1.txt",1);
             }
         }
     }
+
     public void dialogueState(int code) {
 
         if (code == KeyEvent.VK_ENTER) {
             gp.gameState = gp.playState;
         }
     }
+
     public void optionState(int code) {
+
         int maxCommandNum = 3;
         if(code == KeyEvent.VK_ESCAPE){
             gp.gameState = gp.playState;
@@ -118,6 +128,7 @@ public class KeyHandler implements KeyListener {
             }
         }
     }
+
     public void gameOverState(int code) {
 
         if(code == KeyEvent.VK_W) {
@@ -162,5 +173,4 @@ public class KeyHandler implements KeyListener {
             enterPressed = false;
         }
     }
-
 }

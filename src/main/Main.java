@@ -18,6 +18,7 @@ public class Main {
         window.add(gamePanel);
 
         gamePanel.config.loadConfig();
+
         if (gamePanel.fullScreenOn == true) {
             window.setUndecorated(true);
         }
@@ -29,6 +30,5 @@ public class Main {
 
         gamePanel.setupGame();
         gamePanel.startGameThread();
-
     }
 }

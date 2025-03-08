@@ -19,8 +19,7 @@ public class Entity {
     public Rectangle attackArea = new Rectangle(0, 0, 0, 0);
     public int solidAreaDefaultX, solidAreaDefaultY;
     public BufferedImage image, image2, image3;
-    UtilityTool uTool = new UtilityTool();
-    public int type;// 0 - entity.Player. 1 - Monster
+    public int type;// 0 - Player 1 - Monster 2 - Npc
     public String dialogues[] = new String[20];
     public int dialogueIndex = 0;
 
@@ -34,9 +33,9 @@ public class Entity {
     public boolean alive = true;
     public boolean dying = false;
     public boolean hpBarOn = false;
-    public int chaseSpeed;
+    public boolean onPath = false;
     public int attackRange;
-    public int visible_range = 200;
+
     //CONTADOR
     public int spriteCounter = 0;
     public int actionLockCounter = 0;
@@ -60,7 +59,6 @@ public class Entity {
         solidAreaDefaultY = solidArea.y; // Salva a posição padrão Y
 
         this.speed = 2;
-        chaseSpeed = speed * 2;
         this.attackRange = gp.tileSize;
     }
 
@@ -162,6 +160,7 @@ public class Entity {
     }
 
     public void dyingAnimation(Graphics2D g2) {
+
         dyingCounter++;
 
         int i = 5;
@@ -201,10 +200,11 @@ public class Entity {
     public void setAction() {
 
     }
+    public void damageReaction() {
 
-    public void update() {
+    }
+    public void checkCollision() {
 
-        setAction();
         collisionOn = false;
         gp.Colisao.checkTile(this);
         gp.Colisao.checkEntity(this, gp.monster);
@@ -216,6 +216,11 @@ public class Entity {
                 gp.player.invincible = true;
             }
         }
+    }
+    public void update() {
+
+        setAction();
+        checkCollision();
 
         if (collisionOn == false) {
 
@@ -266,6 +271,79 @@ public class Entity {
             case "down": direction = "up"; break;
             case "left": direction = "right"; break;
             case "right": direction = "left"; break;
+        }
+    }
+    public void searchPath(int goalCol, int goalRow) {
+
+        int startCol = (worldX + solidArea.x)/gp.tileSize;
+        int startRow = (worldY + solidArea.y)/gp.tileSize;
+
+        gp.pFinder.setNodes(startCol, startRow, goalCol, goalRow);
+
+        if (gp.pFinder.search() == true) {
+            //Proximo worldX e worldY
+            int nextX = gp.pFinder.pathList.get(0).col * gp.tileSize;
+            int nextY = gp.pFinder.pathList.get(0).row * gp.tileSize;
+
+            //Posição da area sólida das entidades
+            int enLeftX = worldX + solidArea.x;
+            int enRightX = worldX + solidArea.x + solidArea.width;
+            int enTopY = worldY + solidArea.y;
+            int enBottomY = worldY + solidArea.y + solidArea.height;
+
+            if (enTopY > nextY && enLeftX >= nextX && enRightX < nextX + gp.tileSize) {
+                direction = "up";
+            }
+            else if (enTopY < nextY && enLeftX >= nextX && enRightX < nextX + gp.tileSize) {
+                direction = "down";
+            }
+            else if (enTopY >= nextY && enBottomY < nextY + gp.tileSize) {
+                //Esquerda ou direita
+                if (enLeftX > nextX) {
+                    direction = "left";
+                }
+                if (enLeftX < nextX) {
+                    direction = "right";
+                }
+            }
+            else if (enTopY > nextY && enLeftX > nextX) {
+                // cima ou esquerda
+                direction = "up";
+                checkCollision();
+                if (collisionOn == true) {
+                    direction = "left";
+                }
+            }
+            else if (enTopY > nextY && enLeftX < nextX) {
+                // cima ou direita
+                direction = "up";
+                checkCollision();
+                if (collisionOn == true) {
+                    direction = "right";
+                }
+            }
+            else if (enTopY < nextY && enLeftX > nextX) {
+                // baixo ou esquerda
+                direction = "down";
+                checkCollision();
+                if (collisionOn == true) {
+                    direction = "left";
+                }
+            }
+            else if (enTopY < nextY && enLeftX < nextX) {
+                // baixo ou direita
+                direction = "down";
+                checkCollision();
+                if (collisionOn == true) {
+                    direction = "right";
+                }
+            }
+            // Se chegar ao destino, para a busca
+            int nextCol = gp.pFinder.pathList.get(0).col;
+            int nextRow = gp.pFinder.pathList.get(0).row;
+            if (nextCol == goalCol && nextRow == goalRow) {
+                onPath = false;
+            }
         }
     }
 }

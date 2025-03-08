@@ -7,6 +7,7 @@ public class Config {
     GamePanel gp;
 
     public Config(GamePanel gp) {
+
         this.gp = gp;
     }
 
@@ -29,7 +30,9 @@ public class Config {
         }
 
     }
+
     public void loadConfig() {
+
         try {
             BufferedReader br = new BufferedReader(new FileReader("config.txt"));
 

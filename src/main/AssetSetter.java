@@ -8,8 +8,10 @@ public class AssetSetter {
     GamePanel gp;
 
     public AssetSetter(GamePanel gp) {
+
         this.gp = gp;
     }
+
     public void setNpc() {
 
         int mapNum = 0;
@@ -19,6 +21,7 @@ public class AssetSetter {
         gp.npc[mapNum][i].worldY = gp.tileSize*8;
         i++;
     }
+
     public void setMonster() {
 
         int mapNum = 1;

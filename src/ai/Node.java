@@ -2,7 +2,7 @@ package ai;
 
 public class Node {
 
-    Node ai;
+    public Node parent;
     public int col;
     public int row;
     int gCost;

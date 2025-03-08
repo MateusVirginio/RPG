@@ -6,10 +6,12 @@ public class CheckCollision {
     GamePanel gp;
 
     public CheckCollision(GamePanel gp) {
+
         this.gp = gp;
     }
 
     public void checkTile(Entity entity) {
+
         int entityLeftWorldX = entity.worldX + entity.solidArea.x;
         int entityRightWorldX = entity.worldX + entity.solidArea.x + entity.solidArea.width;
         int entityTopWorldY = entity.worldY + entity.solidArea.y;
@@ -73,6 +75,7 @@ public class CheckCollision {
     }
 
     public int checkEntity(Entity entity, Entity[][] target) {
+
         int index = 999;
         for (int i = 0; i < target[gp.currentMap].length; i++) {
             if (target[gp.currentMap][i] != null && target[gp.currentMap][i] != entity) {

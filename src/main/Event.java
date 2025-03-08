@@ -10,6 +10,7 @@ public class Event {
     int tempMap, tempCol, tempRow;
 
     public Event(GamePanel gp) {
+
         this.gp = gp;
 
         eventRect = new EventRect[gp.maxMap][gp.maxWorldCol][gp.maxWorldRow];
@@ -89,4 +90,4 @@ public class Event {
             tempRow = row;
             canTouchEvent = false;
         }
-    }
+}
