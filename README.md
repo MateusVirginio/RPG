@@ -88,8 +88,9 @@ O projeto é organizado em pacotes que separam as responsabilidades:
    git clone https://github.com/seu-usuario/shadowblade-rpg.git
    ```
 2. Abra o projeto em sua IDE.
-3. Compile e execute a classe `Main` no pacote `main`.
-4. Use as teclas do teclado para controlar o jogador e interagir com o jogo.
+3. Marque o package res como resources.
+4. Compile e execute a classe `Main` no pacote `main`.
+5. Use as teclas do teclado para controlar o jogador e interagir com o jogo.
 
 ---
 
