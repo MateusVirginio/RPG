@@ -49,11 +49,13 @@ public class SaveLoad {
 
             DataStorage ds = (DataStorage)ois.readObject();
 
+            gp.currentMap = ds.currentMap;
             gp.player.maxlife = ds.maxlife;
             gp.player.life = ds.life;
             gp.player.worldX = ds.playerWorldX;
             gp.player.worldY = ds.playerWorldY;
-            gp.currentMap = ds.currentMap;
+
+            gp.tileM.loadMaps();
 
             for (int map = 0; map < gp.maxMap; map++) {
                 for (int i = 0; i < gp.monster[map].length; i++) {
