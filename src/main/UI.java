@@ -379,7 +379,6 @@ public class UI {
     }
 
     public void drawTransition() {
-
         counter++;
         g2.setColor(new Color(0, 0, 0, counter*5));
         g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
@@ -393,6 +392,8 @@ public class UI {
             gp.event.previousEventX = gp.player.worldX;
             gp.event.previousEventY = gp.player.worldY;
 
+            // Recarrega o mapa após a transição
+            gp.tileM.loadMaps();
         }
     }
 

@@ -90,10 +90,15 @@ public class KeyHandler implements KeyListener {
             gp.gameState = gp.optionState;
         }
         if (code == KeyEvent.VK_R) {
-            //gp.saveLoad.save();
             switch (gp.currentMap) {
-                case 0: gp.tileM.loadMap("/maps/map04.txt",0);
-                case 1: gp.tileM.loadMap("/maps/teste_s1.txt",1);
+                case 0:
+                    gp.tileM.loadMap("/maps/three_Camada de Blocos 1.csv", 0, gp.tileM.mapTileNumLayer1); // Passa a matriz da camada 1
+                    gp.tileM.loadMap("/maps/three_Camada de Blocos 2.csv", 0, gp.tileM.mapTileNumLayer2); // Passa a matriz da camada 1
+                    break;
+                case 1:
+                    gp.tileM.loadMap("/maps/teste_Camada de Blocos 1.csv", 0, gp.tileM.mapTileNumLayer1); // Passa a matriz da camada 1
+                    gp.tileM.loadMap("/maps/three_Camada de Blocos 2.csv", 0, gp.tileM.mapTileNumLayer2); // Passa a matriz da camada 1
+                    break;
             }
         }
     }

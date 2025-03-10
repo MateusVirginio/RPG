@@ -17,8 +17,8 @@ public class AssetSetter {
         int mapNum = 0;
         int i = 0;
         gp.npc[mapNum][i] = new Npc(gp);
-        gp.npc[mapNum][i].worldX = gp.tileSize*8;
-        gp.npc[mapNum][i].worldY = gp.tileSize*8;
+        gp.npc[mapNum][i].worldX = gp.tileSize*30;
+        gp.npc[mapNum][i].worldY = gp.tileSize*10;
         i++;
     }
 
@@ -27,16 +27,24 @@ public class AssetSetter {
         int mapNum = 1;
         int i = 0;
         gp.monster[mapNum][i] = new MON_Skeleton(gp);
-        gp.monster[mapNum][i].worldX = gp.tileSize*6;
-        gp.monster[mapNum][i].worldY = gp.tileSize*5;
+        gp.monster[mapNum][i].worldX = gp.tileSize*23;
+        gp.monster[mapNum][i].worldY = gp.tileSize*11;
         i++;
         gp.monster[mapNum][i] = new MON_Skeleton(gp);
-        gp.monster[mapNum][i].worldX = gp.tileSize*7;
-        gp.monster[mapNum][i].worldY = gp.tileSize*4;
+        gp.monster[mapNum][i].worldX = gp.tileSize*24;
+        gp.monster[mapNum][i].worldY = gp.tileSize*11;
         i++;
         gp.monster[mapNum][i] = new MON_Skeleton(gp);
-        gp.monster[mapNum][i].worldX = gp.tileSize*9;
-        gp.monster[mapNum][i].worldY = gp.tileSize*4;
+        gp.monster[mapNum][i].worldX = gp.tileSize*25;
+        gp.monster[mapNum][i].worldY = gp.tileSize*11;
+        i++;
+        gp.monster[mapNum][i] = new MON_Skeleton(gp);
+        gp.monster[mapNum][i].worldX = gp.tileSize*26;
+        gp.monster[mapNum][i].worldY = gp.tileSize*11;
+        i++;
+        gp.monster[mapNum][i] = new MON_Skeleton(gp);
+        gp.monster[mapNum][i].worldX = gp.tileSize*26;
+        gp.monster[mapNum][i].worldY = gp.tileSize*12;
         i++;
     }
 }

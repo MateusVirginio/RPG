@@ -50,8 +50,16 @@ public class Event {
             canTouchEvent = true;
         }
         if (canTouchEvent == true) {
-            if (hit(0, 5, 4, "any") == true) {teleport(1, 5, 5);}
-            else if (hit(1, 4, 6, "any") == true) {teleport(0, 5, 4);}
+            if (hit(0, 39, 8, "any") == true) {teleport(1, 1, 11);}
+            else if (hit(1, 0, 10, "any") == true) {teleport(0, 40, 9);}
+        }
+        if (canTouchEvent == true) {
+            if (hit(0, 40, 8, "any") == true) {teleport(1, 1, 11);}
+            else if (hit(1, 0, 11, "any") == true) {teleport(0, 40, 9);}
+        }
+        if (canTouchEvent == true) {
+            if (hit(0, 41, 8, "any") == true) {teleport(1, 1, 11);}
+            else if (hit(1, 0, 12, "any") == true) {teleport(0, 40, 9);}
         }
     }
 

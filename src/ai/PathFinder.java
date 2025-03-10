@@ -80,7 +80,7 @@ public class PathFinder {
 
             //Define o nodo solido
             //Checar os tiles
-            int tileNum = gp.tileM.mapTileNum[gp.currentMap][col][row];
+            int tileNum = gp.tileM.mapTileNumLayer2[gp.currentMap][col][row];
             if (gp.tileM.tile[tileNum].collision == true) {
                 node[col][row].solid = true;
             }
