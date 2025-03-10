@@ -34,10 +34,10 @@ public class Npc extends Entity {
     }
     public void setDialogue() {
 
-        dialogues[0] = "Olá viajante, cuidado com os perigos deste mundo";
-        dialogues[1] = "Dizem que nas cavernas se encontram criaturas \nassustadoras";
-        dialogues[2] = "Na floresta do pau oco, criaturas que ainda não \ndescansaram vagam por lá";
-        dialogues[3] = "tudo mintira karaikkkkk";
+        dialogues[0] = "Viajante, você se atreve a entrar nas Catacumbas da Perdição?";
+        dialogues[1] = "Saiba que muitos aventureiros corajosos como você entraram por \nessas portas... e nunca mais foram vistos.";
+        dialogues[2] = "Os monstros lá dentro são implacáveis, e as sombras escondem \nsegredos que podem consumir até a alma mais forte.";
+        dialogues[3] = "Se você insiste em prosseguir, esteja preparado para \nenfrentar o pior.";
 
     }
     public void speak() {
