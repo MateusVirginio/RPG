@@ -40,6 +40,12 @@ public class Npc extends Entity {
         dialogues[3] = "Se você insiste em prosseguir, esteja preparado para \nenfrentar o pior.";
 
     }
+
+    // Método adicionado para definir diálogos a partir de um array
+    public void setDialogues(String[] newDialogues) {
+        this.dialogues = newDialogues;
+    }
+
     public void speak() {
         super.speak();
     }

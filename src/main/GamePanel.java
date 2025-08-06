@@ -2,6 +2,12 @@ package main;
 
 import ai.PathFinder;
 import data.SaveLoad;
+import editor.MonsterData;
+import editor.MonsterDataSaver;
+import editor.NpcData;
+import editor.NpcDataSaver;
+import editor.PlayerData;
+import editor.PlayerDataSaver;
 import entity.Entity;
 import entity.Player;
 import tile.TileManager;
@@ -9,6 +15,7 @@ import tile.TileManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -54,10 +61,15 @@ public class GamePanel extends JPanel implements Runnable {
     Thread gameThread;
 
     //ENTIDADES E OBJETOS
-    public Player player = new Player(this, keyH);
+    public Player player;
     public Entity monster[][] = new Entity[maxMap][20];
     public Entity npc[][] = new Entity[maxMap][10];
     ArrayList<Entity> entityList = new ArrayList<>();
+
+    // Dados carregados do editor
+    public NpcData npcData;
+    public MonsterData monsterData;
+    public PlayerData playerData;
 
     //ESTADO DO JOGO
     public int gameState;
@@ -71,7 +83,6 @@ public class GamePanel extends JPanel implements Runnable {
 
 
     public GamePanel() {
-
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
         this.setBackground(Color.black);
         this.setDoubleBuffered(true);
@@ -80,7 +91,6 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void setFullScreen() {
-
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         double width = screenSize.getWidth();
         double height = screenSize.getHeight();
@@ -90,7 +100,8 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void setupGame() {
-
+        this.player = new Player(this, keyH);
+        loadAllData();
         aSetter.setMonster();
         aSetter.setNpc();
         gameState = titleState;
@@ -102,8 +113,29 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    public void retry() {
+    public void loadAllData() {
+        this.npcData = new NpcData();
+        this.monsterData = new MonsterData();
 
+        // Carregar dados de mapas, NPCs, monstros e jogador do editor
+        // Supondo que os arquivos do editor são "mapa_camada1.csv" e "mapa_camada2.csv"
+        tileM.loadMap("/res/maps/mapa01_Camada de Blocos 1.csv", 0, tileM.mapTileNumLayer1);
+        tileM.loadMap("/res/maps/mapa01_Camada de Blocos 2.csv", 0, tileM.mapTileNumLayer2);
+
+        NpcDataSaver.loadNpcsFromFile("npcs.npc", npcData);
+        MonsterDataSaver.loadMonstersFromFile("monsters.monster", monsterData);
+        this.playerData = PlayerDataSaver.loadPlayerData("player.player");
+
+        if (playerData != null) {
+            player.worldX = playerData.startX * tileSize;
+            player.worldY = playerData.startY * tileSize;
+            player.maxlife = playerData.maxLife;
+            player.life = playerData.maxLife;
+            player.speed = playerData.speed;
+        }
+    }
+
+    public void retry() {
         currentMap = 0;
         player.setDefaultPositions();
         player.restoreLife();
@@ -112,7 +144,6 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void restart() {
-
         currentMap = 0;
         player.setDefaultValues();
         player.setDefaultPositions();
@@ -122,14 +153,12 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void startGameThread() {
-
         saveLoad.load();
         gameThread = new Thread(this);
         gameThread.start();
     }
 
     public void run() {
-
         double drawInterval = 1000000000 / FPS; // 0.01666 seconds
         double nextDrawTime = System.nanoTime() + drawInterval;
 
@@ -155,7 +184,6 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void update() {
-
         if (gameState == playState) {
             player.update();
             for (int i = 0; i < monster[currentMap].length; i++) {
@@ -180,18 +208,15 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     public void drawToTempScreen() {
-
         g2.clearRect(0, 0, screenWidth2, screenHeight2);
         if (gameState == titleState) {
             ui.draw(g2);
         } else {
             tileM.draw(g2);
             entityList.add(player);
-            //System.out.println("Jogador adicionado à entityList");
             for (int i = 0; i < monster[currentMap].length; i++) {
                 if (monster[currentMap][i] != null) {
                     entityList.add(monster[currentMap][i]);
-                    //System.out.println("Monstro " + i + " adicionado à entityList: " + monster[i].name);
                 }
             }
             for (int i = 0; i < npc[currentMap].length; i++) {
@@ -199,27 +224,21 @@ public class GamePanel extends JPanel implements Runnable {
                     entityList.add(npc[currentMap][i]);
                 }
             }
-                    //SORT
-                    Collections.sort(entityList, new Comparator<Entity>() {
-                        @Override
-                        public int compare(Entity e1, Entity e2) {
-                            return Integer.compare(e1.worldY, e2.worldY);
-                        }
-                    });
-                    // DESENHAR ENTIDADES
-                    for (int j = 0; j < entityList.size(); j++) {
-                        entityList.get(j).draw(g2);
-                    }
-                    // LIMPAR A LISTA APÓS DESENHAR
-                    entityList.clear(); // Limpa a lista uma única vez
-
-                    //ESTADO DE PAUSA
-                    ui.draw(g2);
+            Collections.sort(entityList, new Comparator<Entity>() {
+                @Override
+                public int compare(Entity e1, Entity e2) {
+                    return Integer.compare(e1.worldY, e2.worldY);
                 }
+            });
+            for (int j = 0; j < entityList.size(); j++) {
+                entityList.get(j).draw(g2);
             }
+            entityList.clear();
+            ui.draw(g2);
+        }
+    }
 
     public void drawToScreen() {
-
         Graphics g = getGraphics();
         g.drawImage(tempScreen, 0, 0, screenWidth2, screenHeight2, null);
         g.dispose();

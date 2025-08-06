@@ -258,6 +258,11 @@ public class Entity {
         }
     }
 
+    // Método adicionado para definir diálogos dinamicamente
+    public void setDialogues(String[] dialogues) {
+        this.dialogues = dialogues;
+    }
+
     public void speak() {
 
         if (dialogues[dialogueIndex] == null) {

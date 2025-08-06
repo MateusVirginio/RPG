@@ -1,50 +1,36 @@
 package main;
 
-import monster.MON_Skeleton;
 import entity.Npc;
+import monster.MON_Skeleton;
+import editor.MonsterData;
+import editor.NpcData;
 
 public class AssetSetter {
 
     GamePanel gp;
 
     public AssetSetter(GamePanel gp) {
-
         this.gp = gp;
     }
 
     public void setNpc() {
-
-        int mapNum = 0;
-        int i = 0;
-        gp.npc[mapNum][i] = new Npc(gp);
-        gp.npc[mapNum][i].worldX = gp.tileSize*30;
-        gp.npc[mapNum][i].worldY = gp.tileSize*10;
-        i++;
+        for (int i = 0; i < gp.npcData.getPlacedNpcs().size(); i++) {
+            NpcData.NpcPlacement npcPlacement = gp.npcData.getPlacedNpcs().get(i);
+            gp.npc[0][i] = new Npc(gp);
+            gp.npc[0][i].worldX = gp.tileSize * npcPlacement.col;
+            gp.npc[0][i].worldY = gp.tileSize * npcPlacement.row;
+            gp.npc[0][i].setDialogues(npcPlacement.dialogues);
+        }
     }
 
     public void setMonster() {
-
-        int mapNum = 1;
-        int i = 0;
-        gp.monster[mapNum][i] = new MON_Skeleton(gp);
-        gp.monster[mapNum][i].worldX = gp.tileSize*23;
-        gp.monster[mapNum][i].worldY = gp.tileSize*11;
-        i++;
-        gp.monster[mapNum][i] = new MON_Skeleton(gp);
-        gp.monster[mapNum][i].worldX = gp.tileSize*24;
-        gp.monster[mapNum][i].worldY = gp.tileSize*11;
-        i++;
-        gp.monster[mapNum][i] = new MON_Skeleton(gp);
-        gp.monster[mapNum][i].worldX = gp.tileSize*25;
-        gp.monster[mapNum][i].worldY = gp.tileSize*11;
-        i++;
-        gp.monster[mapNum][i] = new MON_Skeleton(gp);
-        gp.monster[mapNum][i].worldX = gp.tileSize*26;
-        gp.monster[mapNum][i].worldY = gp.tileSize*11;
-        i++;
-        gp.monster[mapNum][i] = new MON_Skeleton(gp);
-        gp.monster[mapNum][i].worldX = gp.tileSize*26;
-        gp.monster[mapNum][i].worldY = gp.tileSize*12;
-        i++;
+        for (int i = 0; i < gp.monsterData.getPlacedMonsters().size(); i++) {
+            MonsterData.MonsterPlacement monsterPlacement = gp.monsterData.getPlacedMonsters().get(i);
+            gp.monster[1][i] = new MON_Skeleton(gp);
+            gp.monster[1][i].worldX = gp.tileSize * monsterPlacement.col;
+            gp.monster[1][i].worldY = gp.tileSize * monsterPlacement.row;
+            gp.monster[1][i].maxlife = monsterPlacement.maxLife;
+            gp.monster[1][i].speed = monsterPlacement.speed;
+        }
     }
 }

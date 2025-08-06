@@ -10,13 +10,13 @@ public class SaveLoad {
     public SaveLoad(GamePanel gp) {
         this.gp = gp;
     }
-    public void save() {
 
+    public void save() {
         try {
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File("save.dat")));
-
             DataStorage ds = new DataStorage();
 
+            // Salvando dados do jogador
             ds.maxlife = gp.player.maxlife;
             ds.life = gp.player.life;
             ds.playerWorldX = gp.player.worldX;
@@ -24,30 +24,28 @@ public class SaveLoad {
             ds.currentMap = gp.currentMap;
 
             // Salvando o estado dos monstros
-            ds.monsterAlive = new boolean[gp.maxMap][20]; // Tamanho da matriz igual ao número de monstros
-
+            ds.monsterAlive = new boolean[gp.maxMap][20];
             for (int map = 0; map < gp.maxMap; map++) {
                 for (int i = 0; i < gp.monster[map].length; i++) {
                     if (gp.monster[map][i] != null) {
                         ds.monsterAlive[map][i] = gp.monster[map][i].alive;
                     } else {
-                        ds.monsterAlive[map][i] = false; // Monstros nulos são considerados mortos
+                        ds.monsterAlive[map][i] = false;
                     }
                 }
             }
+
             oos.writeObject(ds);
             oos.close();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Erro ao Salvar: " + e.getMessage());
         }
     }
-    public void load() {
 
+    public void load() {
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream("save.dat"));
-
-            DataStorage ds = (DataStorage)ois.readObject();
+            DataStorage ds = (DataStorage) ois.readObject();
 
             gp.currentMap = ds.currentMap;
             gp.player.maxlife = ds.maxlife;
@@ -61,8 +59,6 @@ public class SaveLoad {
                 for (int i = 0; i < gp.monster[map].length; i++) {
                     if (gp.monster[map][i] != null) {
                         gp.monster[map][i].alive = ds.monsterAlive[map][i];
-
-                        // Se o monstro estava morto, removemos ele do jogo
                         if (!ds.monsterAlive[map][i]) {
                             gp.monster[map][i] = null;
                         }
@@ -71,7 +67,7 @@ public class SaveLoad {
             }
             ois.close();
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Erro ao Carregar");
         }
     }
