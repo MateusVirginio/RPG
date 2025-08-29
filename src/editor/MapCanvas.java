@@ -20,7 +20,6 @@ public class MapCanvas extends Canvas {
         this.tileSize = tileSize;
         this.editor = editor;
 
-        // Posição inicial do jogador
         this.playerWorldX = editor.maxWorldCol / 2;
         this.playerWorldY = editor.maxWorldRow / 2;
 
@@ -30,22 +29,39 @@ public class MapCanvas extends Canvas {
             int col = (int) (event.getX() / tileSize);
             int row = (int) (event.getY() / tileSize);
 
-            int selectedTileIndex = this.editor.getSelectedTileIndex();
-            int activeLayer = this.editor.getActiveLayer();
-
-            if (selectedTileIndex != -1) {
+            if (editor.isDeleteMode()) {
+                int activeLayer = this.editor.getActiveLayer();
                 if (activeLayer == 1) {
-                    mapData.setMapLayer1Tile(col, row, selectedTileIndex);
+                    mapData.setMapLayer1Tile(col, row, -1);
                 } else {
-                    mapData.setMapLayer2Tile(col, row, selectedTileIndex);
+                    mapData.setMapLayer2Tile(col, row, -1);
                 }
+
+                editor.getNpcData().getPlacedNpcs().removeIf(npc -> npc.col == col && npc.row == row);
+                editor.getMonsterData().getPlacedMonsters().removeIf(monster -> monster.col == col && monster.row == row);
+
                 draw();
-            } else if (editor.getNpcData().isNpcToPlace()) {
-                editor.getNpcData().placeNpc(col, row);
-                draw();
-            } else if (editor.getMonsterData().isMonsterToPlace()) {
-                editor.getMonsterData().placeMonster(col, row);
-                draw();
+            } else if (editor.isFillMode()) {
+                int selectedTileIndex = this.editor.getSelectedTileIndex();
+                if (selectedTileIndex != -1) {
+                    mapData.fill(col, row, selectedTileIndex, editor.getActiveLayer());
+                    draw();
+                }
+            } else {
+                int selectedTileIndex = this.editor.getSelectedTileIndex();
+                int activeLayer = this.editor.getActiveLayer();
+                int brushSize = editor.getBrushSize();
+
+                if (selectedTileIndex != -1) {
+                    mapData.drawBrush(col, row, selectedTileIndex, activeLayer, brushSize);
+                    draw();
+                } else if (editor.getNpcData().isNpcToPlace()) {
+                    editor.getNpcData().placeNpc(col, row);
+                    draw();
+                } else if (editor.getMonsterData().isMonsterToPlace()) {
+                    editor.getMonsterData().placeMonster(col, row);
+                    draw();
+                }
             }
         });
     }
@@ -69,6 +85,9 @@ public class MapCanvas extends Canvas {
         drawNpcs(gc);
         drawMonsters(gc);
         drawPlayer(gc, playerWorldX, playerWorldY);
+        if (editor.isCollisionOverlayMode()) {
+            drawCollisionOverlay(gc);
+        }
     }
 
     private void drawLayer(GraphicsContext gc, int[][] layerData) {
@@ -111,10 +130,24 @@ public class MapCanvas extends Canvas {
     }
 
     private void drawPlayer(GraphicsContext gc, int x, int y) {
-        // Lógica para desenhar o jogador
-        // Substitua por um sprite real do jogador se tiver um
         gc.setFill(Color.BLUE);
         gc.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+    }
+
+    private void drawCollisionOverlay(GraphicsContext gc) {
+        gc.setFill(Color.rgb(255, 0, 0, 0.4));
+        for (int col = 0; col < editor.maxWorldCol; col++) {
+            for (int row = 0; row < editor.maxWorldRow; row++) {
+                int tileIndex = mapData.getMapLayer1()[col][row];
+                if (tileIndex != -1 && editor.getTile(tileIndex).collision) {
+                    gc.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
+                }
+                tileIndex = mapData.getMapLayer2()[col][row];
+                if (tileIndex != -1 && editor.getTile(tileIndex).collision) {
+                    gc.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
+                }
+            }
+        }
     }
 
     private void drawGrid(GraphicsContext gc) {

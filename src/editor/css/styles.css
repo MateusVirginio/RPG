@@ -1,0 +1,81 @@
+.root-pane {
+    -fx-background-color: #2c2c2c;
+    -fx-font-family: "Arial";
+    -fx-text-fill: #ffffff;
+}
+
+.tab-pane {
+    -fx-background-color: #404040;
+    -fx-text-fill: #ffffff;
+}
+
+.tab {
+    -fx-background-color: #505050;
+    -fx-text-fill: #ffffff;
+}
+
+.tab:selected {
+    -fx-background-color: #606060;
+}
+
+.header-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+}
+
+.label {
+    -fx-text-fill: #cccccc;
+}
+
+.button {
+    -fx-background-color: #555555;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #777777;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.button:hover {
+    -fx-background-color: #666666;
+}
+
+.button:pressed {
+    -fx-background-color: #444444;
+}
+
+.text-field, .text-area, .combo-box {
+    -fx-background-color: #383838;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #555555;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: #383838;
+    -fx-text-fill: #ffffff;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .content {
+    -fx-background-color: transparent;
+    -fx-padding: 10;
+}
+
+#deleteButton:hover {
+    -fx-background-color: #ff3333;
+}
+
+.tab-content {
+    -fx-padding: 10px;
+}

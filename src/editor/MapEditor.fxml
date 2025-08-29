@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.layout.Pane?>
+<BorderPane fx:id="root" prefHeight="672.0" prefWidth="1392.0" styleClass="root-pane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+    <center>
+        <Pane fx:id="mapPane" prefHeight="200.0" prefWidth="200.0" />
+    </center>
+    <right>
+        <TabPane fx:id="tabPane" prefHeight="672.0" prefWidth="240.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <tabs>
+                <Tab text="Mapas">
+                    <content>
+                        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+                            <content>
+                                <VBox fx:id="mapTabContent" spacing="10.0" styleClass="tab-content">
+                                    <Label styleClass="header-label" text="Pré-visualização" />
+                                    <ImageView fx:id="previewImageView" fitHeight="64.0" fitWidth="64.0" pickOnBounds="true" preserveRatio="true" />
+                                    <Label fx:id="previewLabel" styleClass="label" text="Índice: --&#10;Colisão: --" />
+                                    <Label styleClass="header-label" text="Paleta de Tiles" />
+                                    <GridPane fx:id="tileGrid" hgap="5.0" vgap="5.0" />
+                                    <Label styleClass="header-label" text="Camada de Edição" />
+                                    <ComboBox fx:id="layerSelector" prefWidth="200.0" />
+                                    <Label styleClass="header-label" text="Ferramentas" />
+                                    <HBox spacing="10.0">
+                                        <Button fx:id="deleteButton" onAction="#toggleDeleteMode" prefWidth="60.0" text="Deletar" />
+                                        <Button fx:id="fillButton" onAction="#toggleFillMode" prefWidth="60.0" text="Preencher" />
+                                        <Button fx:id="collisionButton" onAction="#toggleCollisionOverlay" prefWidth="60.0" text="Colisão" />
+                                    </HBox>
+                                    <Label text="Tamanho do Pincel:" />
+                                    <Slider fx:id="brushSizeSlider" min="1" max="5" value="1" majorTickUnit="1" minorTickCount="0" snapToTicks="true" showTickLabels="true" showTickMarks="true" />
+                                    <HBox spacing="10.0">
+                                        <Button fx:id="saveMapButton" onAction="#saveMap" prefWidth="100.0" text="Salvar" />
+                                        <Button fx:id="loadMapButton" onAction="#loadMap" prefWidth="100.0" text="Carregar" />
+                                    </HBox>
+                                    <Button fx:id="clearMapButton" onAction="#clearMap" prefWidth="210.0" text="Limpar" />
+                                </VBox>
+                            </content>
+                        </ScrollPane>
+                    </content>
+                </Tab>
+                <Tab text="NPCs">
+                    <content>
+                        <VBox spacing="10.0" styleClass="tab-content">
+                            <Label styleClass="header-label" text="Configuração de NPC" />
+                            <Label text="Nome do NPC:" />
+                            <TextField fx:id="npcNameField" promptText="Nome" />
+                            <Label text="Diálogos (separe por vírgulas):" />
+                            <TextArea fx:id="npcDialoguesArea" prefHeight="100.0" promptText="Diálogos" wrapText="true" />
+                            <Button fx:id="addNpcButton" onAction="#addNpcToMap" prefWidth="200.0" text="Adicionar NPC ao Mapa" />
+                            <HBox spacing="10.0">
+                                <Button fx:id="saveNpcButton" onAction="#saveNpcs" prefWidth="100.0" text="Salvar" />
+                                <Button fx:id="loadNpcButton" onAction="#loadNpcs" prefWidth="100.0" text="Carregar" />
+                            </HBox>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab text="Monstros">
+                    <content>
+                        <VBox spacing="10.0" styleClass="tab-content">
+                            <Label styleClass="header-label" text="Configuração de Monstro" />
+                            <Label text="Nome do Monstro:" />
+                            <TextField fx:id="monsterNameField" promptText="Nome" />
+                            <Label text="Vida Máxima:" />
+                            <TextField fx:id="monsterMaxLifeField" promptText="Vida" />
+                            <Label text="Velocidade:" />
+                            <TextField fx:id="monsterSpeedField" promptText="Velocidade" />
+                            <Button fx:id="addMonsterButton" onAction="#addMonsterToMap" prefWidth="200.0" text="Adicionar Monstro ao Mapa" />
+                            <HBox spacing="10.0">
+                                <Button fx:id="saveMonsterButton" onAction="#saveMonsters" prefWidth="100.0" text="Salvar" />
+                                <Button fx:id="loadMonsterButton" onAction="#loadMonsters" prefWidth="100.0" text="Carregar" />
+                            </HBox>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab text="Jogador">
+                    <content>
+                        <VBox spacing="10.0" styleClass="tab-content">
+                            <Label styleClass="header-label" text="Atributos do Jogador" />
+                            <Label text="Vida Máxima:" />
+                            <TextField fx:id="playerMaxLifeField" text="6" />
+                            <Label text="Velocidade:" />
+                            <TextField fx:id="playerSpeedField" text="4" />
+                            <Label text="Posição Inicial (x, y):" />
+                            <HBox spacing="10.0">
+                                <TextField fx:id="playerWorldXField" text="40" promptText="X" />
+                                <TextField fx:id="playerWorldYField" text="37" promptText="Y" />
+                            </HBox>
+                            <Button fx:id="setPlayerButton" onAction="#updatePlayerPosition" prefWidth="200.0" text="Atualizar Posição" />
+                            <HBox spacing="10.0">
+                                <Button fx:id="savePlayerButton" onAction="#savePlayerData" prefWidth="100.0" text="Salvar" />
+                                <Button fx:id="loadPlayerButton" onAction="#loadPlayerData" prefWidth="100.0" text="Carregar" />
+                            </HBox>
+                        </VBox>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </right>
+</BorderPane>

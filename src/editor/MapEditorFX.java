@@ -2,7 +2,9 @@ package editor;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
-import javafx.geometry.Insets;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
@@ -11,7 +13,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import tile.Tile;
@@ -28,6 +29,27 @@ import java.util.Map;
 
 public class MapEditorFX extends Application {
 
+    @FXML private BorderPane root;
+    @FXML private Pane mapPane;
+    @FXML private TabPane tabPane;
+    @FXML private GridPane tileGrid;
+    @FXML private ComboBox<String> layerSelector;
+    @FXML private Button deleteButton;
+    @FXML private Button fillButton;
+    @FXML private Button collisionButton;
+    @FXML private Slider brushSizeSlider;
+    @FXML private TextField npcNameField;
+    @FXML private TextArea npcDialoguesArea;
+    @FXML private TextField monsterNameField;
+    @FXML private TextField monsterMaxLifeField;
+    @FXML private TextField monsterSpeedField;
+    @FXML private TextField playerMaxLifeField;
+    @FXML private TextField playerSpeedField;
+    @FXML private TextField playerWorldXField;
+    @FXML private TextField playerWorldYField;
+    @FXML private ImageView previewImageView;
+    @FXML private Label previewLabel;
+
     final int originalTileSize = 16;
     final int scale = 3;
     final int tileSize = originalTileSize * scale;
@@ -35,14 +57,16 @@ public class MapEditorFX extends Application {
     final int maxWorldRow = 74;
     final int screenWidth = tileSize * 24;
     final int screenHeight = tileSize * 14;
-
     final int paletteCols = 5;
-    final int paletteWidth = paletteCols * tileSize;
 
     private Map<Integer, Tile> tileMap = new HashMap<>();
     private ImageView selectedTileView;
     private int selectedTileIndex = -1;
     private int activeLayer = 1;
+    private boolean deleteMode = false;
+    private boolean fillMode = false;
+    private boolean collisionOverlayMode = false;
+    private int brushSize = 1;
 
     private MapData mapData;
     private MapCanvas mapCanvas;
@@ -50,221 +74,266 @@ public class MapEditorFX extends Application {
 
     private final NpcData npcData = new NpcData();
     private final MonsterData monsterData = new MonsterData();
-
-    // Campos da aba de NPC
-    private TextField npcNameField;
-    private TextArea npcDialoguesArea;
-    private Button addNpcButton;
     private BufferedImage npcImage;
-
-    // Campos da aba de Monstros
-    private TextField monsterNameField;
-    private TextField monsterMaxLifeField;
-    private TextField monsterSpeedField;
-    private Button addMonsterButton;
     private BufferedImage monsterImage;
 
-    // Campos da aba de Player
-    private TextField playerMaxLifeField;
-    private TextField playerSpeedField;
-    private TextField playerWorldXField;
-    private TextField playerWorldYField;
-
+    private BufferedImage grassSpritesheet;
+    private BufferedImage dungeonSpritesheet;
+    private BufferedImage propsSpritesheet;
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
-        primaryStage.setTitle("RPG Map Editor - JavaFX");
 
-        BorderPane root = new BorderPane();
-        Pane mapPane = new Pane();
-        mapPane.setPrefSize(screenWidth, screenHeight);
-        mapPane.setStyle("-fx-background-color: #36454F;");
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/editor/MapEditor.fxml"));
+        loader.setController(this);
+        Parent root = loader.load();
 
         mapData = new MapData(maxWorldCol, maxWorldRow);
         mapCanvas = new MapCanvas(screenWidth, screenHeight, mapData, tileSize, this);
-        mapPane.getChildren().add(mapCanvas);
 
-        TabPane tabPane = new TabPane();
-        tabPane.setPrefSize(paletteWidth, screenHeight);
-        tabPane.getTabs().addAll(createMapTab(), createNpcTab(), createMonsterTab(), createPlayerTab());
+        Pane centerPane = (Pane) root.lookup("#mapPane");
+        if (centerPane != null) {
+            centerPane.getChildren().add(mapCanvas);
+        } else {
+            System.err.println("MapPane não encontrado no FXML. Por favor, verifique o fx:id.");
+        }
 
         loadNpcImage();
         loadMonsterImage();
+        loadSpritesheets();
+        displayTilePalette(tileGrid);
 
-        root.setCenter(mapPane);
-        root.setRight(tabPane);
-
-        Scene scene = new Scene(root, screenWidth + paletteWidth, screenHeight);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
-
-    private Tab createMapTab() {
-        Tab mapTab = new Tab("Mapas");
-        mapTab.setClosable(false);
-
-        VBox content = new VBox(10);
-        content.setPadding(new Insets(10));
-
-        loadTiles();
-
-        VBox paletteBox = new VBox(10);
-        displayTilePalette(paletteBox);
-
-        HBox buttonsBox = new HBox(10);
-        Button saveButton = new Button("Salvar Mapa");
-        saveButton.setOnAction(e -> saveMap());
-
-        Button loadButton = new Button("Carregar Mapa");
-        loadButton.setOnAction(e -> loadMap());
-
-        Button clearButton = new Button("Limpar Mapa");
-        clearButton.setOnAction(e -> {
-            mapData.clearMap(maxWorldCol, maxWorldRow);
-            mapCanvas.draw();
-        });
-
-        buttonsBox.getChildren().addAll(saveButton, loadButton, clearButton);
-
-        ComboBox<String> layerSelector = new ComboBox<>(FXCollections.observableArrayList("Camada 1", "Camada 2"));
+        layerSelector.setItems(FXCollections.observableArrayList("Camada 1", "Camada 2"));
         layerSelector.setValue("Camada 1");
         layerSelector.setOnAction(e -> {
             activeLayer = layerSelector.getValue().equals("Camada 1") ? 1 : 2;
         });
 
-        content.getChildren().addAll(new Label("Paleta de Tiles"), paletteBox, layerSelector, buttonsBox);
-        mapTab.setContent(content);
-        return mapTab;
+        brushSizeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            brushSize = newVal.intValue();
+        });
+
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(getClass().getResource("/editor/css/styles.css").toExternalForm());
+
+        primaryStage.setTitle("RPG Map Editor - JavaFX");
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
-    private Tab createNpcTab() {
-        Tab npcTab = new Tab("NPCs");
-        npcTab.setClosable(false);
+    @FXML
+    private void initialize() {
+    }
 
-        VBox content = new VBox(10);
-        content.setPadding(new Insets(10));
+    @FXML
+    private void saveMap() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Salvar Mapa");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
 
-        Label nameLabel = new Label("Nome do NPC:");
-        npcNameField = new TextField();
+        File file1 = fileChooser.showSaveDialog(primaryStage);
+        if (file1 != null) {
+            File file2 = new File(file1.getAbsolutePath().replace(".csv", "_camada2.csv"));
+            MapSaver.saveMapToCsv(file1.getAbsolutePath(), mapData.getMapLayer1(), maxWorldCol, maxWorldRow);
+            MapSaver.saveMapToCsv(file2.getAbsolutePath(), mapData.getMapLayer2(), maxWorldCol, maxWorldRow);
+            System.out.println("Mapas salvos em: " + file1.getAbsolutePath() + " e " + file2.getAbsolutePath());
+        }
+    }
 
-        Label dialoguesLabel = new Label("Diálogos (separe por vírgulas):");
-        npcDialoguesArea = new TextArea();
-        npcDialoguesArea.setWrapText(true);
+    @FXML
+    private void loadMap() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Carregar Mapa");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
 
-        addNpcButton = new Button("Adicionar NPC ao Mapa");
-        addNpcButton.setOnAction(e -> {
-            String name = npcNameField.getText();
-            String dialogues = npcDialoguesArea.getText();
-            if (!name.isEmpty() && !dialogues.isEmpty()) {
-                npcData.addNpcToPlace(name, dialogues.split(","));
+        File file1 = fileChooser.showOpenDialog(primaryStage);
+        if (file1 != null) {
+            File file2 = new File(file1.getAbsolutePath().replace("_camada1.csv", "_camada2.csv"));
+            mapData.loadMapFromCsv(file1.getAbsolutePath(), 1);
+            if (file2.exists()) {
+                mapData.loadMapFromCsv(file2.getAbsolutePath(), 2);
+            }
+            mapCanvas.draw();
+            System.out.println("Mapa carregado de: " + file1.getAbsolutePath());
+        }
+    }
+
+    @FXML
+    private void clearMap() {
+        mapData.clearMap();
+        mapCanvas.draw();
+    }
+
+    @FXML
+    private void toggleDeleteMode() {
+        deleteMode = !deleteMode;
+        fillMode = false;
+        if (deleteMode) {
+            deleteButton.setStyle("-fx-background-color: #ff3333;");
+            fillButton.setStyle(null);
+            System.out.println("Modo de deleção ativado.");
+        } else {
+            deleteButton.setStyle(null);
+            System.out.println("Modo de deleção desativado.");
+        }
+    }
+
+    @FXML
+    private void toggleFillMode() {
+        fillMode = !fillMode;
+        deleteMode = false;
+        if (fillMode) {
+            fillButton.setStyle("-fx-background-color: #33ccff;");
+            deleteButton.setStyle(null);
+            System.out.println("Modo de preenchimento ativado.");
+        } else {
+            fillButton.setStyle(null);
+            System.out.println("Modo de preenchimento desativado.");
+        }
+    }
+
+    @FXML
+    private void toggleCollisionOverlay() {
+        collisionOverlayMode = !collisionOverlayMode;
+        mapCanvas.draw();
+    }
+
+    @FXML
+    private void addNpcToMap() {
+        String name = npcNameField.getText();
+        String dialogues = npcDialoguesArea.getText();
+        if (!name.isEmpty() && !dialogues.isEmpty()) {
+            npcData.addNpcToPlace(name, dialogues.split(","));
+            mapCanvas.draw();
+            System.out.println("NPC '" + name + "' pronto para ser posicionado. Clique no mapa.");
+        }
+    }
+
+    @FXML
+    private void saveNpcs() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Salvar NPCs");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("NPC Files", "*.npc"));
+
+        File file = fileChooser.showSaveDialog(primaryStage);
+        if (file != null) {
+            NpcDataSaver.saveNpcsToFile(file.getAbsolutePath(), npcData.getPlacedNpcs());
+            System.out.println("NPCs salvos em: " + file.getAbsolutePath());
+        }
+    }
+
+    @FXML
+    private void loadNpcs() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Carregar NPCs");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("NPC Files", "*.npc"));
+
+        File file = fileChooser.showOpenDialog(primaryStage);
+        if (file != null) {
+            npcData.clearNpcs();
+            NpcDataSaver.loadNpcsFromFile(file.getAbsolutePath(), npcData);
+            mapCanvas.draw();
+            System.out.println("NPCs carregados de: " + file.getAbsolutePath());
+        }
+    }
+
+    @FXML
+    private void addMonsterToMap() {
+        try {
+            String name = monsterNameField.getText();
+            int maxLife = Integer.parseInt(monsterMaxLifeField.getText());
+            int speed = Integer.parseInt(monsterSpeedField.getText());
+            if (!name.isEmpty()) {
+                monsterData.addMonsterToPlace(name, maxLife, speed);
                 mapCanvas.draw();
-                System.out.println("NPC '" + name + "' pronto para ser posicionado. Clique no mapa.");
+                System.out.println("Monstro '" + name + "' pronto para ser posicionado. Clique no mapa.");
             }
-        });
-
-        HBox npcButtonsBox = new HBox(10);
-        Button saveNpcButton = new Button("Salvar NPCs");
-        saveNpcButton.setOnAction(e -> saveNpcs());
-
-        Button loadNpcButton = new Button("Carregar NPCs");
-        loadNpcButton.setOnAction(e -> loadNpcs());
-
-        npcButtonsBox.getChildren().addAll(saveNpcButton, loadNpcButton);
-
-        content.getChildren().addAll(new Label("Configuração de NPC"), nameLabel, npcNameField, dialoguesLabel, npcDialoguesArea, addNpcButton, npcButtonsBox);
-        npcTab.setContent(content);
-        return npcTab;
+        } catch (NumberFormatException ex) {
+            System.err.println("Por favor, insira valores numéricos válidos para Vida e Velocidade.");
+        }
     }
 
-    private Tab createMonsterTab() {
-        Tab monsterTab = new Tab("Monstros");
-        monsterTab.setClosable(false);
+    @FXML
+    private void saveMonsters() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Salvar Monstros");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Monster Files", "*.monster"));
 
-        VBox content = new VBox(10);
-        content.setPadding(new Insets(10));
-
-        Label nameLabel = new Label("Nome do Monstro:");
-        monsterNameField = new TextField();
-
-        Label maxLifeLabel = new Label("Vida Máxima:");
-        monsterMaxLifeField = new TextField();
-
-        Label speedLabel = new Label("Velocidade:");
-        monsterSpeedField = new TextField();
-
-        addMonsterButton = new Button("Adicionar Monstro ao Mapa");
-        addMonsterButton.setOnAction(e -> {
-            try {
-                String name = monsterNameField.getText();
-                int maxLife = Integer.parseInt(monsterMaxLifeField.getText());
-                int speed = Integer.parseInt(monsterSpeedField.getText());
-                if (!name.isEmpty()) {
-                    monsterData.addMonsterToPlace(name, maxLife, speed);
-                    mapCanvas.draw();
-                    System.out.println("Monstro '" + name + "' pronto para ser posicionado. Clique no mapa.");
-                }
-            } catch (NumberFormatException ex) {
-                System.err.println("Por favor, insira valores numéricos válidos para Vida e Velocidade.");
-            }
-        });
-
-        HBox monsterButtonsBox = new HBox(10);
-        Button saveMonsterButton = new Button("Salvar Monstros");
-        saveMonsterButton.setOnAction(e -> saveMonsters());
-
-        Button loadMonsterButton = new Button("Carregar Monstros");
-        loadMonsterButton.setOnAction(e -> loadMonsters());
-
-        monsterButtonsBox.getChildren().addAll(saveMonsterButton, loadMonsterButton);
-
-        content.getChildren().addAll(new Label("Configuração de Monstro"), nameLabel, monsterNameField, maxLifeLabel, monsterMaxLifeField, speedLabel, monsterSpeedField, addMonsterButton, monsterButtonsBox);
-        monsterTab.setContent(content);
-        return monsterTab;
+        File file = fileChooser.showSaveDialog(primaryStage);
+        if (file != null) {
+            MonsterDataSaver.saveMonstersToFile(file.getAbsolutePath(), monsterData.getPlacedMonsters());
+            System.out.println("Monstros salvos em: " + file.getAbsolutePath());
+        }
     }
 
-    private Tab createPlayerTab() {
-        Tab playerTab = new Tab("Jogador");
-        playerTab.setClosable(false);
+    @FXML
+    private void loadMonsters() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Carregar Monstros");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Monster Files", "*.monster"));
 
-        VBox content = new VBox(10);
-        content.setPadding(new Insets(10));
+        File file = fileChooser.showOpenDialog(primaryStage);
+        if (file != null) {
+            monsterData.clearMonsters();
+            MonsterDataSaver.loadMonstersFromFile(file.getAbsolutePath(), monsterData);
+            mapCanvas.draw();
+            System.out.println("Monstros carregados de: " + file.getAbsolutePath());
+        }
+    }
 
-        Label maxLifeLabel = new Label("Vida Máxima:");
-        playerMaxLifeField = new TextField("6");
+    @FXML
+    private void updatePlayerPosition() {
+        try {
+            int x = Integer.parseInt(playerWorldXField.getText());
+            int y = Integer.parseInt(playerWorldYField.getText());
+            mapCanvas.updatePlayerPosition(x, y);
+        } catch (NumberFormatException ex) {
+            System.err.println("Por favor, insira valores numéricos válidos para a posição do jogador.");
+        }
+    }
 
-        Label speedLabel = new Label("Velocidade:");
-        playerSpeedField = new TextField("4");
+    @FXML
+    private void savePlayerData() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Salvar Dados do Jogador");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Player Data Files", "*.player"));
 
-        Label posLabel = new Label("Posição Inicial (x, y):");
-        HBox posBox = new HBox(10);
-        playerWorldXField = new TextField("40");
-        playerWorldYField = new TextField("37");
-        posBox.getChildren().addAll(playerWorldXField, playerWorldYField);
-
-        Button setPlayerButton = new Button("Atualizar Posição do Jogador");
-        setPlayerButton.setOnAction(e -> {
+        File file = fileChooser.showSaveDialog(primaryStage);
+        if (file != null) {
             try {
-                int x = Integer.parseInt(playerWorldXField.getText());
-                int y = Integer.parseInt(playerWorldYField.getText());
-                mapCanvas.updatePlayerPosition(x, y);
-            } catch (NumberFormatException ex) {
-                System.err.println("Por favor, insira valores numéricos válidos para a posição do jogador.");
+                int maxLife = Integer.parseInt(playerMaxLifeField.getText());
+                int speed = Integer.parseInt(playerSpeedField.getText());
+                int startX = Integer.parseInt(playerWorldXField.getText());
+                int startY = Integer.parseInt(playerWorldYField.getText());
+
+                PlayerData playerData = new PlayerData(maxLife, speed, startX, startY);
+                PlayerDataSaver.savePlayerData(file.getAbsolutePath(), playerData);
+                System.out.println("Dados do jogador salvos em: " + file.getAbsolutePath());
+            } catch (NumberFormatException e) {
+                System.err.println("Erro: dados do jogador inválidos. Por favor, insira valores numéricos.");
             }
-        });
+        }
+    }
 
-        HBox playerButtonsBox = new HBox(10);
-        Button savePlayerButton = new Button("Salvar Atributos");
-        savePlayerButton.setOnAction(e -> savePlayerData());
+    @FXML
+    private void loadPlayerData() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Carregar Dados do Jogador");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Player Data Files", "*.player"));
 
-        Button loadPlayerButton = new Button("Carregar Atributos");
-        loadPlayerButton.setOnAction(e -> loadPlayerData());
-
-        playerButtonsBox.getChildren().addAll(savePlayerButton, loadPlayerButton);
-
-        content.getChildren().addAll(new Label("Atributos do Jogador"), maxLifeLabel, playerMaxLifeField, speedLabel, playerSpeedField, posLabel, posBox, setPlayerButton, playerButtonsBox);
-        playerTab.setContent(content);
-        return playerTab;
+        File file = fileChooser.showOpenDialog(primaryStage);
+        if (file != null) {
+            PlayerData playerData = PlayerDataSaver.loadPlayerData(file.getAbsolutePath());
+            if (playerData != null) {
+                playerMaxLifeField.setText(String.valueOf(playerData.maxLife));
+                playerSpeedField.setText(String.valueOf(playerData.speed));
+                playerWorldXField.setText(String.valueOf(playerData.startX));
+                playerWorldYField.setText(String.valueOf(playerData.startY));
+                mapCanvas.updatePlayerPosition(playerData.startX, playerData.startY);
+                System.out.println("Dados do jogador carregados de: " + file.getAbsolutePath());
+            }
+        }
     }
 
     private void loadNpcImage() {
@@ -283,14 +352,53 @@ public class MapEditorFX extends Application {
         }
     }
 
-    private void loadTiles() {
-        setup(0, "grama_2", false);
-        setup(25, "grama_1", false);
-        setup(99, "arbusto", true);
-        setup(65, "parede_frente_esquerda_1-4", true);
-        setup(66, "parede_frente_meio_1-5", true);
-        setup(67, "parede_frente_direita_1-4", true);
-        setup(169, "bloco_1-2", true);
+    private void loadSpritesheets() {
+        try {
+            this.grassSpritesheet = ImageIO.read(getClass().getResourceAsStream("/res/tiles/Grass.png"));
+            this.dungeonSpritesheet = ImageIO.read(getClass().getResourceAsStream("/res/tiles/Dungeon.png"));
+            this.propsSpritesheet = ImageIO.read(getClass().getResourceAsStream("/res/tiles/Props.png"));
+
+            splitAndSetup(grassSpritesheet, 8, 8, 0, 0, 0, false);
+            splitAndSetup(grassSpritesheet, 8, 8, 4, 0, 25, false);
+
+            splitAndSetup(dungeonSpritesheet, 18, 18, 0, 0, 64, true);
+            splitAndSetup(dungeonSpritesheet, 18, 18, 0, 10, 248, false);
+            splitAndSetup(dungeonSpritesheet, 18, 18, 0, 12, 288, true);
+            splitAndSetup(dungeonSpritesheet, 18, 18, 0, 14, 324, false);
+
+            splitAndSetup(propsSpritesheet, 10, 10, 0, 0, 400, true);
+            splitAndSetup(propsSpritesheet, 10, 10, 0, 1, 410, false);
+            splitAndSetup(propsSpritesheet, 10, 10, 0, 2, 420, false);
+
+            setup(0, "grama_2", false);
+            setup(25, "grama_1", false);
+            setup(99, "arbusto", true);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void splitAndSetup(BufferedImage sheet, int sheetCols, int sheetRows, int startCol, int startRow, int startIndex, boolean collision) {
+        int tileWidth = sheet.getWidth() / sheetCols;
+        int tileHeight = sheet.getHeight() / sheetRows;
+
+        int index = startIndex;
+        for (int row = startRow; row < sheetRows; row++) {
+            for (int col = startCol; col < sheetCols; col++) {
+                if (index < tileMap.size() + startIndex) {
+                    continue;
+                }
+                BufferedImage subImage = sheet.getSubimage(col * tileWidth, row * tileHeight, tileWidth, tileHeight);
+                BufferedImage scaledImage = scaleImage(subImage, tileSize, tileSize);
+
+                Tile newTile = new Tile();
+                newTile.image = scaledImage;
+                newTile.collision = collision;
+                tileMap.put(index, newTile);
+                index++;
+            }
+        }
     }
 
     private void setup(int index, String imagePath, boolean collision) {
@@ -316,8 +424,7 @@ public class MapEditorFX extends Application {
         return scaledImage;
     }
 
-    private void displayTilePalette(VBox paletteBox) {
-        GridPane tileGrid = new GridPane();
+    private void displayTilePalette(GridPane tileGrid) {
         int col = 0;
         int row = 0;
 
@@ -335,7 +442,8 @@ public class MapEditorFX extends Application {
                 }
                 selectedTileView = imageView;
                 selectedTileIndex = tileIndex;
-                imageView.setStyle("-fx-effect: innershadow(gaussian, green, 10, 1.0, 0, 0);");
+                imageView.setStyle("-fx-effect: innershadow(gaussian, #00FF00, 10, 1.0, 0, 0);");
+                updateSelectedTilePreview(entry.getValue());
             });
 
             tileGrid.add(imageView, col, row);
@@ -345,7 +453,12 @@ public class MapEditorFX extends Application {
                 row++;
             }
         }
-        paletteBox.getChildren().add(tileGrid);
+    }
+
+    private void updateSelectedTilePreview(Tile tile) {
+        javafx.scene.image.Image fxImage = convertToFxImage(tile.image);
+        previewImageView.setImage(fxImage);
+        previewLabel.setText(String.format("Índice: %d\nColisão: %b", selectedTileIndex, tile.collision));
     }
 
     public javafx.scene.image.Image convertToFxImage(BufferedImage image) {
@@ -392,128 +505,20 @@ public class MapEditorFX extends Application {
         return monsterImage;
     }
 
-    private void saveMap() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Salvar Mapa");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
-
-        File file1 = fileChooser.showSaveDialog(primaryStage);
-        if (file1 != null) {
-            File file2 = new File(file1.getAbsolutePath().replace(".csv", "_camada2.csv"));
-            MapSaver.saveMapToCsv(file1.getAbsolutePath(), mapData.getMapLayer1(), maxWorldCol, maxWorldRow);
-            MapSaver.saveMapToCsv(file2.getAbsolutePath(), mapData.getMapLayer2(), maxWorldCol, maxWorldRow);
-            System.out.println("Mapas salvos em: " + file1.getAbsolutePath() + " e " + file2.getAbsolutePath());
-        }
+    public boolean isDeleteMode() {
+        return deleteMode;
     }
 
-    private void loadMap() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Carregar Mapa");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV Files", "*.csv"));
-
-        File file1 = fileChooser.showOpenDialog(primaryStage);
-        if (file1 != null) {
-            File file2 = new File(file1.getAbsolutePath().replace("_camada1.csv", "_camada2.csv"));
-            mapData.loadMapFromCsv(file1.getAbsolutePath(), 1);
-            if (file2.exists()) {
-                mapData.loadMapFromCsv(file2.getAbsolutePath(), 2);
-            }
-            mapCanvas.draw();
-            System.out.println("Mapa carregado de: " + file1.getAbsolutePath());
-        }
+    public boolean isFillMode() {
+        return fillMode;
     }
 
-    private void saveNpcs() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Salvar NPCs");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("NPC Files", "*.npc"));
-
-        File file = fileChooser.showSaveDialog(primaryStage);
-        if (file != null) {
-            NpcDataSaver.saveNpcsToFile(file.getAbsolutePath(), npcData.getPlacedNpcs());
-            System.out.println("NPCs salvos em: " + file.getAbsolutePath());
-        }
+    public int getBrushSize() {
+        return brushSize;
     }
 
-    private void loadNpcs() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Carregar NPCs");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("NPC Files", "*.npc"));
-
-        File file = fileChooser.showOpenDialog(primaryStage);
-        if (file != null) {
-            npcData.clearNpcs();
-            NpcDataSaver.loadNpcsFromFile(file.getAbsolutePath(), npcData);
-            mapCanvas.draw();
-            System.out.println("NPCs carregados de: " + file.getAbsolutePath());
-        }
-    }
-
-    private void saveMonsters() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Salvar Monstros");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Monster Files", "*.monster"));
-
-        File file = fileChooser.showSaveDialog(primaryStage);
-        if (file != null) {
-            MonsterDataSaver.saveMonstersToFile(file.getAbsolutePath(), monsterData.getPlacedMonsters());
-            System.out.println("Monstros salvos em: " + file.getAbsolutePath());
-        }
-    }
-
-    private void loadMonsters() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Carregar Monstros");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Monster Files", "*.monster"));
-
-        File file = fileChooser.showOpenDialog(primaryStage);
-        if (file != null) {
-            monsterData.clearMonsters();
-            MonsterDataSaver.loadMonstersFromFile(file.getAbsolutePath(), monsterData);
-            mapCanvas.draw();
-            System.out.println("Monstros carregados de: " + file.getAbsolutePath());
-        }
-    }
-
-    private void savePlayerData() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Salvar Dados do Jogador");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Player Data Files", "*.player"));
-
-        File file = fileChooser.showSaveDialog(primaryStage);
-        if (file != null) {
-            try {
-                int maxLife = Integer.parseInt(playerMaxLifeField.getText());
-                int speed = Integer.parseInt(playerSpeedField.getText());
-                int startX = Integer.parseInt(playerWorldXField.getText());
-                int startY = Integer.parseInt(playerWorldYField.getText());
-
-                PlayerData playerData = new PlayerData(maxLife, speed, startX, startY);
-                PlayerDataSaver.savePlayerData(file.getAbsolutePath(), playerData);
-                System.out.println("Dados do jogador salvos em: " + file.getAbsolutePath());
-            } catch (NumberFormatException e) {
-                System.err.println("Erro: dados do jogador inválidos. Por favor, insira valores numéricos.");
-            }
-        }
-    }
-
-    private void loadPlayerData() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Carregar Dados do Jogador");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Player Data Files", "*.player"));
-
-        File file = fileChooser.showOpenDialog(primaryStage);
-        if (file != null) {
-            PlayerData playerData = PlayerDataSaver.loadPlayerData(file.getAbsolutePath());
-            if (playerData != null) {
-                playerMaxLifeField.setText(String.valueOf(playerData.maxLife));
-                playerSpeedField.setText(String.valueOf(playerData.speed));
-                playerWorldXField.setText(String.valueOf(playerData.startX));
-                playerWorldYField.setText(String.valueOf(playerData.startY));
-                mapCanvas.updatePlayerPosition(playerData.startX, playerData.startY);
-                System.out.println("Dados do jogador carregados de: " + file.getAbsolutePath());
-            }
-        }
+    public boolean isCollisionOverlayMode() {
+        return collisionOverlayMode;
     }
 
     public static void main(String[] args) {
